@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"main/inventory"
 	"main/userManagement"
 
 	"github.com/gin-gonic/gin"
@@ -21,9 +22,9 @@ func LoginUser(db *sql.DB) gin.HandlerFunc {
 		var creds LoginCredentials
 
 		// Parse the form data from the request body
-		if err := c.ShouldBind(&creds); err != nil {
+		if err := c.ShouldBindJSON(&creds); err != nil {
 			log.Printf("Error occurred while parsing request: %v", err)
-			c.HTML(http.StatusBadRequest, "login.html", gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Invalid request body",
 			})
 			return
@@ -33,7 +34,7 @@ func LoginUser(db *sql.DB) gin.HandlerFunc {
 		user, err := userManagement.GetUserData(db, creds.Username)
 		if err != nil {
 			log.Printf("Error fetching user data: %v", err)
-			c.HTML(http.StatusUnauthorized, "login.html", gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid username or password",
 			})
 			return
@@ -42,14 +43,14 @@ func LoginUser(db *sql.DB) gin.HandlerFunc {
 		// Check if the provided password matches the hashed password in the database
 		if CheckPasswordMatchLogin(creds.Password, user.PasswordHashed) {
 			// Successful login: Render a welcome page with the user's info
-			c.HTML(http.StatusOK, "welcome.html", gin.H{
+			c.JSON(http.StatusOK, gin.H{
 				"username": user.Username,
 				"role":     user.Role,
 				"user_id":  user.Id,
 			})
 		} else {
 			// Password doesn't match: Render login page with error
-			c.HTML(http.StatusUnauthorized, "login.html", gin.H{
+			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid username or password",
 			})
 		}
@@ -70,6 +71,14 @@ func DebugUsers(db *sql.DB) gin.HandlerFunc {
 	return userManagement.FetchUsers(db)
 }
 
-func VerifyAuthentication(db *sql.DB) gin.HandlerFunc {
-	return userManagement.VerifyCode(db)
+func ManageNewCoffee(db *sql.DB) gin.HandlerFunc {
+	return inventory.AddCoffee(db)
+}
+
+func DeleteOldCoffee(db *sql.DB) gin.HandlerFunc {
+	return inventory.DeleteCoffee(db)
+}
+
+func DisplayCoffeeList(db *sql.DB) gin.HandlerFunc {
+	return inventory.GetInventory(db)
 }

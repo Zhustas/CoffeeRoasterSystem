@@ -6,7 +6,6 @@ import (
 
 	"database/sql"
 	"main/endpoints"
-	"main/pages"
 
 	"github.com/gin-gonic/gin"
 
@@ -25,20 +24,18 @@ func main() {
 
 	r := gin.Default()
 
-	r.Static("/static", "../frontend/static")
-	r.LoadHTMLGlob("../frontend/templates/*")
-
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 
-	r.GET("/", pages.ViewMainPage())
 	r.POST("/login", endpoints.LoginUser(db))
-	r.GET("/loginview", pages.LoginPage())
 	r.POST("/register", endpoints.Register(db))
-	r.GET("/registerview", pages.RegisterPage())
+	r.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
+	r.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
+	r.POST("/addcoffee", endpoints.ManageNewCoffee(db))
+	r.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
 	// r.GET("/debuggingusers", endpoints.DebugUsers(db))
 	// r.POST("/verifyauth", endpoints.VerifyAuthentication(db))
 	// r.GET("/genereatepassword", endpoints.CreatePassword)
