@@ -22,8 +22,8 @@ func RegisterUser(db *sql.DB) gin.HandlerFunc {
 		var newUser User
 
 		// Parse form data (as registration is typically handled via forms)
-		if err := c.ShouldBind(&newUser); err != nil {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		if err := c.ShouldBindJSON(&newUser); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Invalid input data. Please try again.",
 			})
 			return
@@ -36,7 +36,7 @@ func RegisterUser(db *sql.DB) gin.HandlerFunc {
 		hashedPassword, err := hashPassword(newUser.PasswordHashed)
 		if err != nil {
 			log.Printf("Error hashing password: %v", err)
-			c.HTML(http.StatusInternalServerError, "register.html", gin.H{
+			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Internal server error. Please try again later.",
 			})
 			return
@@ -48,12 +48,12 @@ func RegisterUser(db *sql.DB) gin.HandlerFunc {
 		if err != nil {
 			// Handle potential errors, such as duplicate usernames or emails
 			if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-				c.HTML(http.StatusInternalServerError, "register.html", gin.H{
+				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "This username or email is already taken. Please choose another.",
 				})
 			} else {
 				log.Printf("Error occurred while registering user: %v", err)
-				c.HTML(http.StatusInternalServerError, "register.html", gin.H{
+				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "Failed to register user. Please try again later.",
 				})
 			}
@@ -61,8 +61,9 @@ func RegisterUser(db *sql.DB) gin.HandlerFunc {
 		}
 
 		// Successfully registered user
-		c.HTML(http.StatusOK, "register_success.html", gin.H{
-			"message": "Registration successful! You can now log in.",
+		c.JSON(http.StatusOK, gin.H{
+			"message":        "Registration successful! You can now log in.",
+			"dbActionStatus": "SUCCESS",
 		})
 	}
 }
