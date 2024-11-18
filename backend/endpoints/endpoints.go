@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"main/auth"
 	"main/inventory"
 	"main/userManagement"
 
@@ -20,8 +21,8 @@ type LoginCredentials struct {
 func LoginUser(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var creds LoginCredentials
+		sessionConfig := auth.DefaultSessionConfig()
 
-		// Parse the form data from the request body
 		if err := c.ShouldBindJSON(&creds); err != nil {
 			log.Printf("Error occurred while parsing request: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -40,16 +41,19 @@ func LoginUser(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Check if the provided password matches the hashed password in the database
+		// Check if the provided password matches
 		if CheckPasswordMatchLogin(creds.Password, user.PasswordHashed) {
-			// Successful login: Render a welcome page with the user's info
-			c.JSON(http.StatusOK, gin.H{
-				"username": user.Username,
-				"role":     user.Role,
-				"user_id":  user.Id,
-			})
+			// Set session cookie
+			err := auth.SetSessionCookie(c, db, sessionConfig, user.Id, user.Username)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Failed to create session",
+				})
+				return
+			}
+
+			// The response is now handled by SetSessionCookie
 		} else {
-			// Password doesn't match: Render login page with error
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid username or password",
 			})
