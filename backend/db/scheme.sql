@@ -39,3 +39,20 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (coffee_id) REFERENCES coffee(id)
 );
+
+-- Add this to your database schema
+CREATE TABLE sessions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Add an index for faster token lookups
+CREATE INDEX idx_sessions_token ON sessions(token);
+
+-- Add an index for cleanup of expired sessions
+CREATE INDEX idx_sessions_expires_at ON sessions(expires_at);

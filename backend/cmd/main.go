@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
-	"net/http"
+	"time"
+
+	"main/auth"
 
 	"database/sql"
 	"main/endpoints"
@@ -14,6 +16,17 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func setupSessionCleanup(db *sql.DB) {
+	ticker := time.NewTicker(1 * time.Hour)
+	go func() {
+		for range ticker.C {
+			if err := auth.CleanupExpiredSessions(db); err != nil {
+				log.Printf("Error cleaning up sessions: %v", err)
+			}
+		}
+	}()
+}
+
 func main() {
 
 	db, err := sql.Open("sqlite3", "db/coffee.db") //open db connection
@@ -22,23 +35,27 @@ func main() {
 	}
 	defer db.Close() // close db
 
+	// Start session cleanup routine
+	setupSessionCleanup(db)
+
 	r := gin.Default()
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	// Session configuration
+	sessionConfig := auth.DefaultSessionConfig()
 
+	// Public routes
 	r.POST("/login", endpoints.LoginUser(db))
 	r.POST("/register", endpoints.Register(db))
-	r.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
-	r.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
-	r.POST("/addcoffee", endpoints.ManageNewCoffee(db))
-	r.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
-	// r.GET("/debuggingusers", endpoints.DebugUsers(db))
-	// r.POST("/verifyauth", endpoints.VerifyAuthentication(db))
-	// r.GET("/genereatepassword", endpoints.CreatePassword)
 
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	// Protected routes
+	protected := r.Group("/")
+	protected.Use(auth.AuthMiddleware(db, sessionConfig))
+	{
+		protected.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
+		protected.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
+		protected.POST("/addcoffee", endpoints.ManageNewCoffee(db))
+		protected.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
+	}
+
+	r.Run()
 }
