@@ -28,12 +28,11 @@ func setupSessionCleanup(db *sql.DB) {
 }
 
 func main() {
-
-	db, err := sql.Open("sqlite3", "db/coffee.db") //open db connection
+	db, err := sql.Open("sqlite3", "db/coffee.db") // Open DB connection
 	if err != nil {
 		log.Fatal("Error opening database: ", err)
 	}
-	defer db.Close() // close db
+	defer db.Close() // Close DB connection
 
 	// Start session cleanup routine
 	setupSessionCleanup(db)
@@ -51,10 +50,27 @@ func main() {
 	protected := r.Group("/")
 	protected.Use(auth.AuthMiddleware(db, sessionConfig))
 	{
+		// Coffee inventory accessible to all authenticated users
 		protected.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
-		protected.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
-		protected.POST("/addcoffee", endpoints.ManageNewCoffee(db))
-		protected.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
+
+		// Admin and roaster routes
+		adminOrRoaster := protected.Group("/")
+		adminOrRoaster.Use(auth.RoleMiddleware("admin", "roaster"))
+		{
+			adminOrRoaster.POST("/registernewuser", endpoints.AdminRegister(db))
+			adminOrRoaster.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
+			adminOrRoaster.POST("/addcoffee", endpoints.ManageNewCoffee(db))
+			adminOrRoaster.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
+			adminOrRoaster.GET("/orderlist", endpoints.ViewOrders(db))
+			adminOrRoaster.POST("/updateorders/:id", endpoints.UpdateOrders(db))
+		}
+
+		// Customer routes
+		customer := protected.Group("/")
+		customer.Use(auth.RoleMiddleware("customer"))
+		{
+			customer.POST("/order", endpoints.CreateNewOrder(db))
+		}
 	}
 
 	r.Run()

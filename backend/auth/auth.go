@@ -23,6 +23,7 @@ type Session struct {
 	ID        int64
 	UserID    int64
 	Token     string
+	Role      string // Add user role
 	CreatedAt time.Time
 	ExpiresAt time.Time
 	IsActive  bool
@@ -81,15 +82,17 @@ func CreateSession(db *sql.DB, userID int64, token string, lifetime time.Duratio
 func ValidateSession(db *sql.DB, token string) (*Session, error) {
 	session := &Session{}
 	query := `
-        SELECT id, user_id, token, created_at, expires_at, is_active
-        FROM sessions
-        WHERE token = ? AND is_active = TRUE AND expires_at > datetime('now')
+        SELECT s.id, s.user_id, s.token, u.role, s.created_at, s.expires_at, s.is_active
+        FROM sessions s
+        INNER JOIN users u ON s.user_id = u.id
+        WHERE s.token = ? AND s.is_active = TRUE AND s.expires_at > datetime('now')
     `
 
 	err := db.QueryRow(query, token).Scan(
 		&session.ID,
 		&session.UserID,
 		&session.Token,
+		&session.Role, // Fetch user role
 		&session.CreatedAt,
 		&session.ExpiresAt,
 		&session.IsActive,
@@ -201,6 +204,7 @@ func AuthMiddleware(db *sql.DB, config SessionConfig) gin.HandlerFunc {
 
 		// Add session info to context
 		c.Set("user_id", session.UserID)
+		c.Set("user_role", session.Role) // Add user role to context
 		c.Set("session_token", token)
 		c.Next()
 	}
@@ -221,5 +225,27 @@ func LogoutHandler(db *sql.DB, config SessionConfig) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Logged out successfully",
 		})
+	}
+}
+
+func RoleMiddleware(allowedRoles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("user_role")
+		if !exists {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden: No role found"})
+			c.Abort()
+			return
+		}
+
+		userRole := role.(string)
+		for _, allowedRole := range allowedRoles {
+			if userRole == allowedRole {
+				c.Next()
+				return
+			}
+		}
+
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden: Insufficient permissions"})
+		c.Abort()
 	}
 }
