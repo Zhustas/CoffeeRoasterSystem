@@ -61,13 +61,15 @@ func main() {
 			adminOrRoaster.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
 			adminOrRoaster.POST("/addcoffee", endpoints.ManageNewCoffee(db))
 			adminOrRoaster.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
+			adminOrRoaster.GET("/orderlist", endpoints.ViewOrders(db))
+			adminOrRoaster.POST("/updateorders/:id", endpoints.UpdateOrders(db))
 		}
 
 		// Customer routes
 		customer := protected.Group("/")
 		customer.Use(auth.RoleMiddleware("customer"))
 		{
-			customer.POST("/orders", endpoints.CreateNewOrder(db))
+			customer.POST("/order", endpoints.CreateNewOrder(db))
 		}
 	}
 

@@ -8,6 +8,7 @@ import (
 	"main/auth"
 	"main/customer"
 	"main/inventory"
+	"main/orders"
 	"main/userManagement"
 
 	"github.com/gin-gonic/gin"
@@ -94,4 +95,12 @@ func DisplayCoffeeList(db *sql.DB) gin.HandlerFunc {
 
 func CreateNewOrder(db *sql.DB) gin.HandlerFunc {
 	return customer.CreateOrder(db)
+}
+
+func ViewOrders(db *sql.DB) gin.HandlerFunc {
+	return orders.InspectOrders(db)
+}
+
+func UpdateOrders(db *sql.DB) gin.HandlerFunc {
+	return orders.UpdateOrderStatus(db)
 }
