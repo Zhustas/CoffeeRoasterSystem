@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"main/auth"
+	"main/customer"
 	"main/inventory"
 	"main/userManagement"
 
@@ -71,6 +72,10 @@ func Register(db *sql.DB) gin.HandlerFunc {
 	return userManagement.RegisterUser(db)
 }
 
+func AdminRegister(db *sql.DB) gin.HandlerFunc {
+	return userManagement.AdminRegisterUser(db)
+}
+
 func DebugUsers(db *sql.DB) gin.HandlerFunc {
 	return userManagement.FetchUsers(db)
 }
@@ -85,4 +90,8 @@ func DeleteOldCoffee(db *sql.DB) gin.HandlerFunc {
 
 func DisplayCoffeeList(db *sql.DB) gin.HandlerFunc {
 	return inventory.GetInventory(db)
+}
+
+func CreateNewOrder(db *sql.DB) gin.HandlerFunc {
+	return customer.CreateOrder(db)
 }
