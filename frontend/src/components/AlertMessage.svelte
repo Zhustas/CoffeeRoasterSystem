@@ -13,7 +13,7 @@
 <div
 	class="animate-slide-message absolute {COLORS[
 		status
-	]} right-5 top-16 px-8 py-4 shadow-md shadow-black"
+	]} right-5 top-16 w-fit max-w-80 px-8 py-4 shadow-md shadow-black"
 >
 	<p class="font-medium text-white">{message}</p>
 </div>

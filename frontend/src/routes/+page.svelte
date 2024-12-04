@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AlertMessage from '../components/AlertMessage.svelte';
 	import * as AlertMessageConstants from '../constants/AlertMessageConstants';
+	import { hashWithSHA256 } from '$lib/Functions';
 
 	const LOGIN_FORM_TYPE: number = 0,
 		REGISTER_FORM_TYPE: number = 1;
@@ -51,9 +52,27 @@
 		}
 	}
 
-	// Error'ų tipai
+	// KONSTANTOS
+
+	const CONST_VALID_PASSWORD_LENGTH = 8;
+	const CONST_VALID_MIN_USERNAME_LENGTH = 5;
+	const CONST_VALID_MAX_USERNAME_LENGTH = 30;
+	const CONST_VALID_MAX_NAME_LASTNAME_LENGTH = 50;
+
 	const ERROR_MESSAGE_EMPTY_INPUT = 'Užpildykite lauką.';
 	const ERROR_MESSAGE_PASSWORDS_NOT_MATCH = 'Slaptažodžiai nesutampa.';
+	const ERROR_MESSAGE_PASSWORD_TOO_SHORT = `Slaptažodis turi būti sudarytas bent iš ${CONST_VALID_PASSWORD_LENGTH} simbolių.`;
+	const ERROR_MESSAGE_USERNAME_BAD_LENGTH = `Vartotojo vardas turi būti nuo ${CONST_VALID_MIN_USERNAME_LENGTH} iki ${CONST_VALID_MAX_USERNAME_LENGTH} simbolių.`;
+	const ERROR_MESSAGE_EMAIL_INVALID = 'Blogas elektroninio pašto formatas.';
+	const ERROR_MESSAGE_NAME_LASTNAME_BAD_LENGTH = `Lauko ilgis turi būti iki ${CONST_VALID_MAX_NAME_LASTNAME_LENGTH} simbolių.`;
+	const ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS = 'Laukas turi būti sudarytas tik iš raidžių.';
+	const ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS_NUMBERS =
+		'Laukas turi būti sudarytas tik iš raidžių ir skaičių.';
+	const ERROR_MESSAGE_USERNAME_EMAIL_EXISTS =
+		'Vartotojo vardas arba elektroninis paštas jau egzistuoja.';
+
+	const ERROR_SERVER_USERNAME_EMAIL_EXISTS =
+		'This username or email is already taken. Please choose another.';
 
 	// Funkcija, skirta atnaujinti lauką (kad suveiktų Svelte reactivity (puslapis rerender'intų))
 	function refreshInputData(input: InputData) {
@@ -107,12 +126,6 @@
 	function updateInputDataErrors() {
 		const inputs = currentFormType === LOGIN_FORM_TYPE ? getLoginInputs() : getRegisterInputs();
 
-		if (currentFormType === REGISTER_FORM_TYPE) {
-			if (passwordRegister.value !== passwordRepeat.value) {
-				setInputDataError(passwordRepeat, ERROR_MESSAGE_PASSWORDS_NOT_MATCH);
-			}
-		}
-
 		inputs.forEach((input) => {
 			if (!input.value) {
 				setInputDataError(input, ERROR_MESSAGE_EMPTY_INPUT);
@@ -120,6 +133,76 @@
 				removeInputDataError(input);
 			}
 		});
+
+		if (currentFormType === REGISTER_FORM_TYPE) {
+			if (!name.error) {
+				if (name.value.length > CONST_VALID_MAX_NAME_LASTNAME_LENGTH) {
+					setInputDataError(name, ERROR_MESSAGE_NAME_LASTNAME_BAD_LENGTH);
+				} else if (!hasOnlyLetters(name.value)) {
+					setInputDataError(name, ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS);
+				}
+			}
+
+			if (!lastname.error) {
+				if (lastname.value.length > CONST_VALID_MAX_NAME_LASTNAME_LENGTH) {
+					setInputDataError(lastname, ERROR_MESSAGE_NAME_LASTNAME_BAD_LENGTH);
+				} else if (!hasOnlyLetters(lastname.value)) {
+					setInputDataError(lastname, ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS);
+				}
+			}
+
+			if (!email.error) {
+				if (!isEmailValid(email.value)) {
+					setInputDataError(email, ERROR_MESSAGE_EMAIL_INVALID);
+				}
+			}
+
+			if (!usernameRegister.error) {
+				if (
+					usernameRegister.value.length < CONST_VALID_MIN_USERNAME_LENGTH ||
+					usernameRegister.value.length > CONST_VALID_MAX_USERNAME_LENGTH
+				) {
+					setInputDataError(usernameRegister, ERROR_MESSAGE_USERNAME_BAD_LENGTH);
+				} else if (!hasOnlyLettersNumbers(usernameRegister.value)) {
+					setInputDataError(usernameRegister, ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS_NUMBERS);
+				}
+			}
+
+			if (!passwordRegister.error) {
+				if (passwordRegister.value.length < CONST_VALID_PASSWORD_LENGTH) {
+					setInputDataError(passwordRegister, ERROR_MESSAGE_PASSWORD_TOO_SHORT);
+				}
+			}
+
+			if (!passwordRepeat.error) {
+				if (passwordRegister.value !== passwordRepeat.value) {
+					setInputDataError(passwordRepeat, ERROR_MESSAGE_PASSWORDS_NOT_MATCH);
+				}
+			}
+		}
+	}
+
+	// Patikrina, ar reikšmė turi tik raides
+	function hasOnlyLetters(value: string) {
+		const lettersRegex = new RegExp(/^\p{L}+$/u);
+
+		return value.match(lettersRegex);
+	}
+
+	// Patikrina, ar reikšmė turi tik raides ir skaičius
+	function hasOnlyLettersNumbers(value: string) {
+		const lettersNumbersRegex = new RegExp(/^[\p{L}0-9]+$/u);
+
+		return value.match(lettersNumbersRegex);
+	}
+
+	// Patikrina, ar elektroninis paštas atitinka formatą
+	function isEmailValid(email: string) {
+		const emailRegex = new RegExp(
+			/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+		);
+
+		return email.match(emailRegex);
 	}
 
 	// Ar yra nors viena klaida prisijungime/registracijoje
@@ -130,7 +213,6 @@
 	}
 
 	let anyRequestPending: boolean = false;
-	let showMessage: boolean = false;
 
 	// Login request
 	async function sendLoginRequest() {
@@ -146,9 +228,15 @@
 		anyRequestPending = false;
 
 		if (response.status === 200) {
+			showAlertMessage(AlertMessageConstants.STATUS_SUCCESS, 'Prisijungimas sėkmingas!');
 			window.location.assign('/main');
+		} else if (response.status === 401) {
+			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Blogi prisijungimo duomenys.');
+		} else if (response.status === 500) {
+			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Klaida serveryje.');
+		} else {
+			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Įvyko nežinoma klaida.');
 		}
-		console.log(response.status);
 	}
 
 	// Register request
@@ -159,7 +247,7 @@
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				username: usernameRegister.value,
-				password: passwordRegister.value,
+				password: await hashWithSHA256(passwordRegister.value),
 				name: name.value,
 				surname: lastname.value,
 				email: email.value,
@@ -169,16 +257,40 @@
 		anyRequestPending = false;
 
 		if (response.status === 200) {
-			showMessage = true;
-			setTimeout(() => {
-				showMessage = false;
-			}, 5000);
+			showAlertMessage(AlertMessageConstants.STATUS_SUCCESS, 'Registracija sėkminga!');
 			currentFormType = LOGIN_FORM_TYPE;
 			buttonName = LOGIN_BUTTON_NAME;
 			setDefaultInputData(REGISTER_FORM_TYPE);
+		} else if (response.status === 409) {
+			showAlertMessage(
+				AlertMessageConstants.STATUS_FAILURE,
+				'Toks vartotojo vardas arba elektroninis paštas jau egzistuoja.'
+			);
+		} else if (response.status === 500) {
+			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Klaida serveryje.');
 		} else {
-			console.log(await response.json());
+			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Įvyko nežinoma klaida.');
 		}
+	}
+
+	interface AlertMessageHandler {
+		show: boolean;
+		status: string;
+		message: string;
+	}
+
+	const alertMessageHandler: AlertMessageHandler = { show: false, status: '', message: '' };
+	function showAlertMessage(status: string, message: string) {
+		if (alertMessageHandler.show) {
+			return;
+		}
+
+		alertMessageHandler.show = true;
+		alertMessageHandler.status = status;
+		alertMessageHandler.message = message;
+		setTimeout(() => {
+			alertMessageHandler.show = false;
+		}, 5000);
 	}
 
 	// Pagrindinė request siuntimo funkcija
@@ -204,10 +316,10 @@
 <!-- https://svelte.dev/docs/svelte/snippet -->
 
 <!-- Magija -->
-<div class="flex h-screen flex-col">
-	<article class="grid grow grid-cols-2">
-		<div id="right-side" class="flex flex-col pl-52 pt-32">
-			<div class="text-8xl font-bold">
+<div class="flex min-h-screen flex-col justify-center">
+	<article class="grid grow grid-cols-1 lg:grid-cols-2">
+		<div id="right-side" class="flex flex-col pl-5 pt-5 lg:pl-12 lg:pt-32 xl:pl-24 2xl:pl-52">
+			<div class="self-center text-6xl font-bold sm:self-auto sm:text-8xl">
 				<p>Kavos</p>
 				<div class="relative w-fit">
 					<p>Skrudykla</p>
@@ -216,7 +328,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="mt-24 pr-12 text-lg font-medium">
+			<div class="mt-16 pr-5 text-lg font-medium lg:mt-24 lg:pl-0 lg:pr-12">
 				<p>Sveiki atvykę į Kavos Skrudyklą!</p>
 				<p>
 					Sistema pasiekiama prisijungus su vartotojo paskyra. Jeigu neturite vartotojo paskyros,
@@ -226,8 +338,8 @@
 			</div>
 		</div>
 
-		<div id="left-side" class="flex p-5">
-			<div id="form" class="max-w-xl grow content-center">
+		<div id="left-side" class="flex justify-center p-5 lg:justify-normal">
+			<div id="form" class="z-10 grow content-center lg:max-w-xl">
 				<div id="form-upper" class="grid h-8 grid-cols-2 text-center text-sm">
 					<div
 						class="bg-main flex cursor-pointer rounded-tl-full rounded-tr-full {currentFormType ===
@@ -463,6 +575,6 @@
 	</footer>
 </div>
 
-{#if showMessage}
-	<AlertMessage status={AlertMessageConstants.STATUS_SUCCESS} message="Registracija sėkminga!" />
+{#if alertMessageHandler.show}
+	<AlertMessage status={alertMessageHandler.status} message={alertMessageHandler.message} />
 {/if}
