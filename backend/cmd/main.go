@@ -53,6 +53,7 @@ func main() {
 		// Coffee inventory accessible to all authenticated users
 		protected.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
 		protected.POST("/fetchcoffee/:id", endpoints.GetCoffeeWithId(db))
+		protected.POST("/fetchuser/:session_token", endpoints.GetSingleUser(db))
 
 		// Admin and roaster routes
 		adminOrRoaster := protected.Group("/")
@@ -72,6 +73,7 @@ func main() {
 		customer.Use(auth.RoleMiddleware("customer"))
 		{
 			customer.POST("/order", endpoints.CreateNewOrder(db))
+			customer.POST("/fetchuserorder/:id", endpoints.GetAllUserOrders(db))
 		}
 	}
 
