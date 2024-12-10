@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,7 @@ import (
 )
 
 type Coffee struct {
-	ID          int
+	ID          int     `json:"ID"`
 	Name        string  `json:"name"`
 	RoastType   string  `json:"roast_type"`
 	Description string  `json:"description"`
@@ -99,7 +100,7 @@ func AddCoffee(db *sql.DB) gin.HandlerFunc {
 
 func DeleteCoffee(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id := c.Param("ID")
+		id := c.Param("id")
 		if id == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid coffee ID"})
 			return
@@ -121,6 +122,40 @@ func DeleteCoffee(db *sql.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"title":          "RoastingRooster Coffee Inventory",
 			"dbActionStatus": "SUCCESS",
+		})
+	}
+}
+
+func GetCoffee(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid coffee ID"})
+			return
+		}
+		var coffee Coffee
+		err := db.QueryRow("SELECT name, roast_type, description, stock, price FROM coffee WHERE id = ?", id).
+			Scan(&coffee.Name, &coffee.RoastType, &coffee.Description, &coffee.Stock, &coffee.Price)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Coffee not found"})
+			} else {
+				log.Printf("Error creating a coffee object: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Error creating a coffee object.",
+				})
+			}
+			return
+		}
+
+		coffee.ID, err = strconv.Atoi(id)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Couldn't convert to string. Check the value of id"})
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"title":        "RoastingRooster Coffee Inventory",
+			"coffeeObject": coffee,
 		})
 	}
 }
