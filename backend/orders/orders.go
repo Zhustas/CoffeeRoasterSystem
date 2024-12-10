@@ -91,3 +91,31 @@ func UpdateOrderStatus(db *sql.DB) gin.HandlerFunc {
 		})
 	}
 }
+
+func DeleteOrder(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid coffee ID"})
+			return
+		}
+
+		query := "DELETE FROM orders WHERE id = ?"
+		res, err := db.Exec(query, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete order"})
+			return
+		}
+
+		rowsAffected, _ := res.RowsAffected()
+		if rowsAffected == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"title":          "RoastingRooster Coffee Inventory",
+			"dbActionStatus": "SUCCESS",
+		})
+	}
+}
