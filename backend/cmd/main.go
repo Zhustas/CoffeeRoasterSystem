@@ -52,6 +52,7 @@ func main() {
 	{
 		// Coffee inventory accessible to all authenticated users
 		protected.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
+		protected.POST("/fetchcoffee/:id", endpoints.GetCoffeeWithId(db))
 
 		// Admin and roaster routes
 		adminOrRoaster := protected.Group("/")
