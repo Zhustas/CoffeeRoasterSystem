@@ -73,6 +73,7 @@ func main() {
 		customer.Use(auth.RoleMiddleware("customer"))
 		{
 			customer.POST("/order", endpoints.CreateNewOrder(db))
+			customer.POST("/fetchuserorder/:id", endpoints.GetAllUserOrders(db))
 		}
 	}
 

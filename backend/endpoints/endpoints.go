@@ -116,3 +116,7 @@ func GetCoffeeWithId(db *sql.DB) gin.HandlerFunc {
 func GetSingleUser(db *sql.DB) gin.HandlerFunc {
 	return userManagement.GetSingleUserData(db)
 }
+
+func GetAllUserOrders(db *sql.DB) gin.HandlerFunc {
+	return orders.GetUserOrders(db)
+}
