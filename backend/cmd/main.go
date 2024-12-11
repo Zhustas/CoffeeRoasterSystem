@@ -28,7 +28,7 @@ func setupSessionCleanup(db *sql.DB) {
 }
 
 func main() {
-	db, err := sql.Open("sqlite3", "db/coffee.db") // Open DB connection
+	db, err := sql.Open("sqlite3", "../db/coffee.db") // Open DB connection
 	if err != nil {
 		log.Fatal("Error opening database: ", err)
 	}

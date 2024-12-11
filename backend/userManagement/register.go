@@ -29,9 +29,6 @@ func RegisterUser(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Only allow customer registration via the website
-		newUser.Role = "customer"
-
 		// Hash the password
 		hashedPassword, err := hashPassword(newUser.PasswordHashed)
 		if err != nil {
