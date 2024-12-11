@@ -104,3 +104,19 @@ func ViewOrders(db *sql.DB) gin.HandlerFunc {
 func UpdateOrders(db *sql.DB) gin.HandlerFunc {
 	return orders.UpdateOrderStatus(db)
 }
+
+func DeleteOldOrder(db *sql.DB) gin.HandlerFunc {
+	return orders.DeleteOrder(db)
+}
+
+func GetCoffeeWithId(db *sql.DB) gin.HandlerFunc {
+	return inventory.GetCoffee(db)
+}
+
+func GetSingleUser(db *sql.DB) gin.HandlerFunc {
+	return userManagement.GetSingleUserData(db)
+}
+
+func GetAllUserOrders(db *sql.DB) gin.HandlerFunc {
+	return orders.GetUserOrders(db)
+}

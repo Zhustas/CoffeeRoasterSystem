@@ -91,3 +91,74 @@ func UpdateOrderStatus(db *sql.DB) gin.HandlerFunc {
 		})
 	}
 }
+
+func DeleteOrder(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid coffee ID"})
+			return
+		}
+
+		query := "DELETE FROM orders WHERE id = ?"
+		res, err := db.Exec(query, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete order"})
+			return
+		}
+
+		rowsAffected, _ := res.RowsAffected()
+		if rowsAffected == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"title":          "RoastingRooster Coffee Inventory",
+			"dbActionStatus": "SUCCESS",
+		})
+	}
+}
+
+func GetUserOrders(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+
+		rows, err := db.Query(`
+            SELECT id, user_id, total_amount, status, created_at, updated_at
+            FROM orders
+            WHERE user_id = ?
+        `)
+		if err != nil {
+			log.Printf("Error fetching orders: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to load orders. Please try again later.",
+			})
+			return
+		}
+		defer rows.Close()
+
+		var orders []Order
+		for rows.Next() {
+			var order Order
+			if err := rows.Scan(&order.ID, &order.UserID, &order.TotalAmount, &order.Status, &order.CreatedAt, &order.UpdatedAt); err != nil {
+				log.Printf("Error scanning order: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Error loading order data.",
+				})
+				return
+			}
+			orders = append(orders, order)
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"title":  "Pending Orders",
+			"orders": orders,
+		})
+	}
+}
