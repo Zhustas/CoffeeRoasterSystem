@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AlertMessage from '../components/AlertMessage.svelte';
+	import Footer from '../components/Footer.svelte';
 	import * as AlertMessageConstants from '../constants/AlertMessageConstants';
 	import { hashWithSHA256 } from '$lib/Functions';
 
@@ -242,6 +243,7 @@
 	// Register request
 	async function sendRegisterRequest() {
 		anyRequestPending = true;
+
 		const response = await fetch('/api/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -567,12 +569,7 @@
 		</div>
 	</article>
 
-	<footer class="flex h-12 border-t border-gray-400 bg-white">
-		<img alt="Kavos Skrudykla logo" src="logo.png" class="ml-5 h-7 w-7 self-center rounded-full" />
-		<p class="ml-5 self-center text-xs font-medium text-gray-400">
-			&copy; 2024 UAB "Kavos Skrudykla"
-		</p>
-	</footer>
+	<Footer />
 </div>
 
 {#if alertMessageHandler.show}

@@ -1,6 +1,8 @@
-import { redirect } from '@sveltejs/kit';
+import * as db from '$lib/server/database';
+import type { PageServerLoad } from './$types';
 
-export function load() {
-	// Patikrinti session token
-	// redirect(307, '/');
-}
+export const load: PageServerLoad = async ({ params }) => {
+	return {
+		coffees: await db.getCoffees()
+	};
+};

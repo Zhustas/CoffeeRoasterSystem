@@ -1,14 +1,16 @@
 import { VITE_SERVER_ADDRESS } from '$env/static/private';
+import { hashWithSHA256 } from '$lib/Functions';
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
 	const { username, password } = await request.json();
 	let response;
 
 	try {
+		const hashedPassword = await hashWithSHA256(password);
 		response = await fetch(VITE_SERVER_ADDRESS + '\\login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username: username, password: password })
+			body: JSON.stringify({ username: username, password: hashedPassword })
 		});
 	} catch (e: unknown) {
 		const error = e as Error;
@@ -24,10 +26,15 @@ export async function POST({ request }) {
 		return new Response(null, { status: response.status });
 	}
 
-	return new Response(
-		JSON.stringify({ message: 'Login successful!', body: await response.json() }),
-		{
-			status: 200
-		}
-	);
+	const body = await response.json();
+	const { expires_at, session_token } = body;
+
+	cookies.set('session_token', session_token, {
+		httpOnly: true,
+		path: '/'
+	});
+
+	return new Response(JSON.stringify({ message: 'Login successful!', body: body }), {
+		status: 200
+	});
 }
