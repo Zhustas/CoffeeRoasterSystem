@@ -17,6 +17,14 @@ type Order struct {
 	UpdatedAt   string  `json:"updated_at"`
 }
 
+type OrderItems struct {
+	ID        int64   `json:"id"`
+	OrderID   int64   `json:"order_id"`
+	CoffeeID  int64   `json:"coffee_id"`
+	Quantity  int64   `json:"quantity"`
+	UnitPrice float64 `json:"unit_price"`
+}
+
 // InspectOrders fetches all pending orders and returns them
 func InspectOrders(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -159,6 +167,46 @@ func GetUserOrders(db *sql.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"title":  "Pending Orders",
 			"orders": orders,
+		})
+	}
+}
+
+func GetOrderItems(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+			return
+		}
+
+		rows, err := db.Query(`
+            SELECT id, order_id, coffee_id, quantity, unit_price
+            FROM order_items
+            WHERE order_id = ?
+        `)
+		if err != nil {
+			log.Printf("Error fetching order items: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to load orders. Please try again later.",
+			})
+			return
+		}
+		defer rows.Close()
+		var order OrderItems
+		for rows.Next() {
+			if err := rows.Scan(&order.ID, &order.OrderID, &order.CoffeeID, &order.Quantity, &order.UnitPrice); err != nil {
+				log.Printf("Error scanning order: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Error loading order data.",
+				})
+				return
+			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"title":       "Pending Orders",
+			"order_items": order,
 		})
 	}
 }
