@@ -77,7 +77,7 @@ func AdminRegister(db *sql.DB) gin.HandlerFunc {
 	return userManagement.AdminRegisterUser(db)
 }
 
-func DebugUsers(db *sql.DB) gin.HandlerFunc {
+func GetAllUsers(db *sql.DB) gin.HandlerFunc {
 	return userManagement.FetchUsers(db)
 }
 
@@ -119,4 +119,12 @@ func GetSingleUser(db *sql.DB) gin.HandlerFunc {
 
 func GetAllUserOrders(db *sql.DB) gin.HandlerFunc {
 	return orders.GetUserOrders(db)
+}
+
+func DeleteAUser(db *sql.DB) gin.HandlerFunc {
+	return userManagement.DeleteUser(db)
+}
+
+func GetAllOrderItems(db *sql.DB) gin.HandlerFunc {
+	return orders.GetOrderItems(db)
 }

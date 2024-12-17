@@ -54,6 +54,7 @@ func main() {
 		protected.GET("/coffeeinventory", endpoints.DisplayCoffeeList(db))
 		protected.POST("/fetchcoffee/:id", endpoints.GetCoffeeWithId(db))
 		protected.POST("/fetchuser/:session_token", endpoints.GetSingleUser(db))
+		protected.POST("/getorderitems/:id", endpoints.GetAllOrderItems(db))
 
 		// Admin and roaster routes
 		adminOrRoaster := protected.Group("/")
@@ -66,6 +67,8 @@ func main() {
 			adminOrRoaster.GET("/orderlist", endpoints.ViewOrders(db))
 			adminOrRoaster.POST("/updateorders/:id", endpoints.UpdateOrders(db))
 			adminOrRoaster.POST("/deleteorder/:id", endpoints.DeleteOldOrder(db))
+			adminOrRoaster.GET("/fetchallusers", endpoints.GetAllUsers(db))
+			adminOrRoaster.POST("/deleteuser/:id", endpoints.DeleteAUser(db))
 		}
 
 		// Customer routes
