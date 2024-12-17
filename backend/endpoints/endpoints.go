@@ -77,7 +77,7 @@ func AdminRegister(db *sql.DB) gin.HandlerFunc {
 	return userManagement.AdminRegisterUser(db)
 }
 
-func DebugUsers(db *sql.DB) gin.HandlerFunc {
+func GetAllUsers(db *sql.DB) gin.HandlerFunc {
 	return userManagement.FetchUsers(db)
 }
 

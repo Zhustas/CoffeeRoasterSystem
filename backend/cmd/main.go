@@ -66,6 +66,7 @@ func main() {
 			adminOrRoaster.GET("/orderlist", endpoints.ViewOrders(db))
 			adminOrRoaster.POST("/updateorders/:id", endpoints.UpdateOrders(db))
 			adminOrRoaster.POST("/deleteorder/:id", endpoints.DeleteOldOrder(db))
+			adminOrRoaster.GET("/fetchallusers", endpoints.GetAllUsers(db))
 		}
 
 		// Customer routes
