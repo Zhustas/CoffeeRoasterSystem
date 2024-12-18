@@ -9,7 +9,8 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				page: '#FFFDBB',
+				// page: '#FFFDBB',
+				page: '#FFFDD1',
 				// main: '#F0DCD0',
 				main: '#FCEDE3',
 				button: '#EABB9F',
@@ -29,6 +30,11 @@ export default {
 			animation: {
 				slide: 'slide 3s linear infinite',
 				'slide-message': 'slide-message 0.5s ease-out'
+			},
+			margin: {
+				page: '16rem',
+				top: '6rem',
+				bottom: '3rem'
 			}
 		}
 	},
