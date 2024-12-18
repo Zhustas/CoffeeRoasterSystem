@@ -108,17 +108,16 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
+<button
+	aria-label="Paspauskite, kad baigtumėte naujos kavos kūrimo procesą."
 	onclick={cancelCreate}
 	id="overlay"
-	class="fixed left-0 top-0 h-full w-full bg-black opacity-70"
-></div>
+	class="fixed left-0 top-0 h-full w-full cursor-default bg-black opacity-70"
+></button>
 <div
 	id="modal"
 	class="fixed left-1/2 top-1/2 h-fit w-96 -translate-x-1/2 -translate-y-1/2 transform
-	rounded-lg bg-white px-4 pb-3 pt-2"
+	rounded-lg bg-white px-6 pb-3 pt-2"
 >
 	<div>
 		<p class="mb-5 mt-1 text-2xl font-medium">Naujos kavos pridėjimas</p>

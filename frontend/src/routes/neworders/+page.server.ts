@@ -1,4 +1,3 @@
-import { USER_CUSTOMER } from '$lib/constans';
 import * as db from '$lib/server/database';
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
@@ -9,15 +8,8 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const user = await db.getUserBySessionToken(sessionToken);
 
 	if (user) {
-		if (user.role === USER_CUSTOMER) {
-			return {
-				user,
-				coffees: await db.getCoffees(sessionToken)
-			};
-		}
-
 		return {
-			user
+			orders: await db.getOrders(sessionToken)
 		};
 	}
 

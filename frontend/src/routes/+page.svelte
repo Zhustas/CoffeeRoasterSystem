@@ -1,8 +1,8 @@
 <script lang="ts">
-	import AlertMessage from '../components/AlertMessage.svelte';
+	import AlertMessage from '../lib/components/AlertMessage.svelte';
 	import Footer from '../components/Footer.svelte';
 	import * as AlertMessageConstants from '../constants/AlertMessageConstants';
-	import { hashWithSHA256 } from '$lib/Functions';
+	import { hashWithSHA256 } from '$lib/functions';
 
 	const LOGIN_FORM_TYPE: number = 0,
 		REGISTER_FORM_TYPE: number = 1;
@@ -230,7 +230,13 @@
 
 		if (response.status === 200) {
 			showAlertMessage(AlertMessageConstants.STATUS_SUCCESS, 'Prisijungimas sėkmingas!');
-			window.location.assign('/main');
+
+			const params = new URLSearchParams(window.location.search);
+			if (params.has('redirectTo')) {
+				window.location.assign(params.get('redirectTo'));
+			} else {
+				window.location.assign('/main');
+			}
 		} else if (response.status === 401) {
 			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Blogi prisijungimo duomenys.');
 		} else if (response.status === 500) {
@@ -318,6 +324,11 @@
 <!-- https://svelte.dev/docs/svelte/snippet -->
 
 <!-- Magija -->
+
+<svelte:head>
+	<title>Kavos Skrudykla</title>
+</svelte:head>
+
 <div class="flex min-h-screen flex-col justify-center">
 	<article class="grid grow grid-cols-1 lg:grid-cols-2">
 		<div id="right-side" class="flex flex-col pl-5 pt-5 lg:pl-12 lg:pt-32 xl:pl-24 2xl:pl-52">

@@ -1,5 +1,5 @@
 import { VITE_SERVER_ADDRESS } from '$env/static/private';
-import { hashWithSHA256 } from '$lib/Functions';
+import { hashWithSHA256 } from '$lib/functions';
 
 export async function POST({ request, cookies }) {
 	const { username, password } = await request.json();
