@@ -101,6 +101,10 @@ func ViewOrders(db *sql.DB) gin.HandlerFunc {
 	return orders.InspectOrders(db)
 }
 
+func ViewAllOrders(db *sql.DB) gin.HandlerFunc {
+	return orders.InspectAllOrders(db)
+}
+
 func UpdateOrders(db *sql.DB) gin.HandlerFunc {
 	return orders.UpdateOrderStatus(db)
 }

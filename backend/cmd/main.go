@@ -65,6 +65,7 @@ func main() {
 			adminOrRoaster.POST("/addcoffee", endpoints.ManageNewCoffee(db))
 			adminOrRoaster.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
 			adminOrRoaster.GET("/orderlist", endpoints.ViewOrders(db))
+			adminOrRoaster.GET("/allorderlist", endpoints.ViewAllOrders(db))
 			adminOrRoaster.POST("/updateorders/:id", endpoints.UpdateOrders(db))
 			adminOrRoaster.POST("/deleteorder/:id", endpoints.DeleteOldOrder(db))
 			adminOrRoaster.GET("/fetchallusers", endpoints.GetAllUsers(db))

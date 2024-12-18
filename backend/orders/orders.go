@@ -63,6 +63,42 @@ func InspectOrders(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
+// InspectOrders fetches all pending orders and returns them
+func InspectAllOrders(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Fetch pending orders
+		rows, err := db.Query(`
+            SELECT id, user_id, total_amount, status, created_at, updated_at
+            FROM orders`)
+		if err != nil {
+			log.Printf("Error fetching orders: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to load orders. Please try again later.",
+			})
+			return
+		}
+		defer rows.Close()
+
+		var orders []Order
+		for rows.Next() {
+			var order Order
+			if err := rows.Scan(&order.ID, &order.UserID, &order.TotalAmount, &order.Status, &order.CreatedAt, &order.UpdatedAt); err != nil {
+				log.Printf("Error scanning order: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Error loading order data.",
+				})
+				return
+			}
+			orders = append(orders, order)
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"title":  "Pending Orders",
+			"orders": orders,
+		})
+	}
+}
+
 // UpdateOrderStatus updates the status of a specific order
 func UpdateOrderStatus(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -141,7 +177,7 @@ func GetUserOrders(db *sql.DB) gin.HandlerFunc {
             SELECT id, user_id, total_amount, status, created_at, updated_at
             FROM orders
             WHERE user_id = ?
-        `)
+        `, id)
 		if err != nil {
 			log.Printf("Error fetching orders: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -184,7 +220,7 @@ func GetOrderItems(db *sql.DB) gin.HandlerFunc {
             SELECT id, order_id, coffee_id, quantity, unit_price
             FROM order_items
             WHERE order_id = ?
-        `)
+        `, id)
 		if err != nil {
 			log.Printf("Error fetching order items: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
