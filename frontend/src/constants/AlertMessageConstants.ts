@@ -1,5 +1,0 @@
-const STATUS_SUCCESS = 'success';
-const STATUS_INFORMATION = 'info';
-const STATUS_FAILURE = 'failure';
-
-export { STATUS_SUCCESS, STATUS_INFORMATION, STATUS_FAILURE };

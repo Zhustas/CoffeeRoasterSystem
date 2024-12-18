@@ -7,4 +7,4 @@ interface Coffee {
 	price: number;
 }
 
-export { Coffee };
+export type { Coffee };
