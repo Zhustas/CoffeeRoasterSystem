@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { hashWithSHA256 } from '$lib/functions';
-	import { userAddedStatus, wantsToAddUser } from '../../stores';
+	import { userAddedStatus, wantsToAddUser } from '../stores';
 	import AlertMessage from './AlertMessage.svelte';
 	import * as AlertMessageConstants from '../../constants/AlertMessageConstants';
 	import { onMount } from 'svelte';

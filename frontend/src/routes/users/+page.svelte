@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import AddUser from '$lib/components/AddUser.svelte';
-	import { USER_ADMIN } from '$lib/constans';
-	import { userAddedStatus, wantsToAddUser } from '../../stores';
-	import Footer from '../../components/Footer.svelte';
-	import AlertMessage from '../../lib/components/AlertMessage.svelte';
-	import * as AlertMessageConstants from '../../constants/AlertMessageConstants';
+	import { USER_ADMIN } from '$lib/constants/UserTypeConstants';
+	import { userAddedStatus, wantsToAddUser } from '$lib/stores';
+	import Footer from '$lib/components/Footer.svelte';
+	import AlertMessage from '$lib/components/AlertMessage.svelte';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 

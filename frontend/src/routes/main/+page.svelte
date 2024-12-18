@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import type { Coffee } from '$lib/coffee';
-	import { onMount } from 'svelte';
-	import { USER_ADMIN, USER_CUSTOMER, USER_ROASTER } from '$lib/constans';
+	import { USER_ADMIN, USER_CUSTOMER, USER_ROASTER } from '$lib/constants/UserTypeConstants';
 	import MainCustomer from '$lib/components/MainCustomer.svelte';
 	import MainAdmin from '$lib/components/MainAdmin.svelte';
 	import MainRoaster from '$lib/components/MainRoaster.svelte';

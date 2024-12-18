@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as AlertMessageConstants from '../../constants/AlertMessageConstants';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 
 	let { status, message }: { status: string; message: string } = $props();
 

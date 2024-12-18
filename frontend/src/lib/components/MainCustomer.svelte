@@ -5,7 +5,7 @@
 	import Footer from '../../components/Footer.svelte';
 	import CoffeeTab from '../../components/CoffeeTab.svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { USER_CUSTOMER } from '$lib/constans';
+	import { USER_CUSTOMER } from '$lib/constants/UserTypeConstants';
 
 	let { coffees }: { coffees: Coffee[] } = $props();
 

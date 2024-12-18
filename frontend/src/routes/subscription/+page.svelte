@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
-	import { USER_CUSTOMER } from '$lib/constans';
-	import Footer from '../../components/Footer.svelte';
+	import { USER_CUSTOMER } from '$lib/constants/UserTypeConstants';
+	import Footer from '$lib/components/Footer.svelte';
 </script>
 
 <svelte:head>

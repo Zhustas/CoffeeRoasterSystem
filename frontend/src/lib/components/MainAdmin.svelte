@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { USER_ADMIN } from '$lib/constans';
+	import { USER_ADMIN } from '$lib/constants/UserTypeConstants';
 	import Footer from '../../components/Footer.svelte';
 	import Header from './Header.svelte';
 

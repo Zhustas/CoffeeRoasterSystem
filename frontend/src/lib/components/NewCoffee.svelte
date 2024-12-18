@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { wantsToAddCoffee } from '../../stores';
+	import { wantsToAddCoffee } from '$lib/stores';
 
 	// Lauko kintamieji. Kaip C++ struct
 	interface InputData {

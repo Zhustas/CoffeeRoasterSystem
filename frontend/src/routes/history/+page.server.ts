@@ -1,5 +1,5 @@
-import { USER_CUSTOMER } from '$lib/constans';
-import type { Order } from '$lib/Order';
+import { USER_CUSTOMER } from '$lib/constants/UserTypeConstants';
+import type { Order } from '$lib/order';
 import * as db from '$lib/server/database';
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';

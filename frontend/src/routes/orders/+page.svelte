@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import type { Order } from '$lib/order';
-	import Footer from '../../components/Footer.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import { onMount } from 'svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { USER_ADMIN, USER_ROASTER } from '$lib/constans';
-	import AlertMessage from '../../lib/components/AlertMessage.svelte';
-	import * as AlertMessageConstants from '../../constants/AlertMessageConstants';
+	import { USER_ADMIN, USER_ROASTER } from '$lib/constants/UserTypeConstants';
+	import AlertMessage from '$lib/components/AlertMessage.svelte';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 
 	let { data }: { data: PageData } = $props();
 	let orders: Order[] = $state(data.orders.orders);

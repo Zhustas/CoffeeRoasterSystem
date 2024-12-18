@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
-	import Footer from '../../components/Footer.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { USER_ADMIN, USER_CUSTOMER, USER_ROASTER } from '$lib/constans';
+	import { USER_ADMIN, USER_CUSTOMER, USER_ROASTER } from '$lib/constants/UserTypeConstants';
 
 	let { data }: { data: PageData } = $props();
 	let user = data;

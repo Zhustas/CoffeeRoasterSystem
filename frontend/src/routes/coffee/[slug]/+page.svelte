@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Coffee } from '../../../lib/coffee';
+	import type { Coffee } from '$lib/coffee';
 	import type { PageData } from './$types';
-	import AlertMessage from '../../../lib/components/AlertMessage.svelte';
-	import * as AlertMessageConstants from '../../../constants/AlertMessageConstants';
+	import AlertMessage from '$lib/components/AlertMessage.svelte';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 	import CardCredentialsTab from '$lib/components/CardCredentialsTab.svelte';
-	import { wantsToMakeOrder } from '../../../stores';
+	import { wantsToMakeOrder } from '$lib/stores';
 
 	let { data }: { data: PageData } = $props();
 	let coffee: Coffee = $state(data.coffee);

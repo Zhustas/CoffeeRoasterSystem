@@ -1,4 +1,4 @@
-import { USER_CUSTOMER } from '$lib/constans';
+import { USER_CUSTOMER } from '$lib/constants/UserTypeConstants';
 import * as db from '$lib/server/database';
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';

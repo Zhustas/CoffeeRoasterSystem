@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AlertMessage from '../lib/components/AlertMessage.svelte';
-	import Footer from '../components/Footer.svelte';
-	import * as AlertMessageConstants from '../constants/AlertMessageConstants';
+	import Footer from '$lib/components/Footer.svelte';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 	import { hashWithSHA256 } from '$lib/functions';
 
 	const LOGIN_FORM_TYPE: number = 0,

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import type { Coffee } from '$lib/coffee';
-	import NewCoffee from './NewCoffee.svelte';
-	import { wantsToAddCoffee } from '../../stores';
-	import Footer from '../../components/Footer.svelte';
+	import NewCoffee from '$lib/components/NewCoffee.svelte';
+	import { wantsToAddCoffee } from '$lib/stores';
+	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { USER_ROASTER } from '$lib/constans';
+	import { USER_ROASTER } from '$lib/constants/UserTypeConstants';
 	import { onMount } from 'svelte';
 
 	let { data }: { data: PageData } = $props();

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
-	import { USER_ADMIN, USER_CUSTOMER, USER_ROASTER } from '$lib/constans';
-	import Footer from '../../components/Footer.svelte';
+	import { USER_ADMIN, USER_CUSTOMER, USER_ROASTER } from '$lib/constants/UserTypeConstants';
+	import Footer from '$lib/components/Footer.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { wantsToMakeOrder } from '../../stores';
+	import { wantsToMakeOrder } from '../stores';
 
 	const { makeOrder } = $props();
 

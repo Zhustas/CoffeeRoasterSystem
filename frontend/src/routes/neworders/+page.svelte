@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import type { Order } from '$lib/order';
-	import Footer from '../../components/Footer.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import { onMount } from 'svelte';
 	import Header from '$lib/components/Header.svelte';
-	import { USER_ROASTER } from '$lib/constans';
+	import { USER_ROASTER } from '$lib/constants/UserTypeConstants';
 
 	let { data }: { data: PageData } = $props();
 	let orders: Order[] = data.orders.orders;

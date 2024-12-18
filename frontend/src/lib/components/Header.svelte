@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { USER_ADMIN, USER_CUSTOMER, USER_NONE, USER_ROASTER } from '$lib/constans';
+	import {
+		USER_ADMIN,
+		USER_CUSTOMER,
+		USER_NONE,
+		USER_ROASTER
+	} from '$lib/constants/UserTypeConstants';
 
 	let { userType }: { userType: string } = $props();
 </script>

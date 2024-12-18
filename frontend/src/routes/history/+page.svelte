@@ -2,12 +2,12 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import type { Order } from '$lib/order';
-	import Footer from '../../components/Footer.svelte';
-	import { wantsToCancelOrder } from '../../stores';
-	import AlertMessage from '../../lib/components/AlertMessage.svelte';
-	import * as AlertMessageConstants from '../../constants/AlertMessageConstants';
+	import Footer from '$lib/components/Footer.svelte';
+	import { wantsToCancelOrder } from '$lib/stores';
+	import AlertMessage from '$lib/components/AlertMessage.svelte';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 	import Header from '$lib/components/Header.svelte';
-	import { USER_CUSTOMER } from '$lib/constans';
+	import { USER_CUSTOMER } from '$lib/constants/UserTypeConstants';
 	import type { Coffee } from '$lib/coffee';
 
 	let { data }: { data: PageData } = $props();
