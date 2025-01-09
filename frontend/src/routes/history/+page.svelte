@@ -27,10 +27,6 @@
 
 	let euroFormatter: Intl.NumberFormat = $state();
 
-	// $inspect(orders[0]);
-	// $inspect(orderItems);
-	// $inspect(coffees[1]);
-
 	onMount(() => {
 		filterDates();
 
@@ -210,78 +206,84 @@
 		</div>
 
 		<div class="px-10">
-			{#each dates as date, i}
-				<div class={i !== dates.length - 1 ? 'mb-8' : ''}>
-					<p class="mb-4 ml-2 w-96 border-b-2 border-black text-2xl font-medium">{date}</p>
-					<div class="flex flex-col gap-8">
-						{#each orders as order}
-							{#if formatDate(order.created_at) === date}
-								<div class="flex min-h-32 rounded-md bg-white py-2 hover:bg-gray-100">
-									<div class="flex grow">
-										{#if getCoffeeRoastTypeByOrderId(order.id) === 'light'}
-											<img alt="Light coffee bean" src="light_bean.png" class="w-36 p-2" />
-										{:else if getCoffeeRoastTypeByOrderId(order.id) === 'medium'}
-											<img alt="Medium coffee bean" src="medium_bean.png" class="w-36 p-2" />
-										{:else if getCoffeeRoastTypeByOrderId(order.id) === 'dark'}
-											<img alt="Medium coffee bean" src="dark_bean.png" class="w-36 p-2" />
-										{/if}
+			{#if orders.length !== 0}
+				{#each dates as date, i}
+					<div class={i !== dates.length - 1 ? 'mb-8' : ''}>
+						<p class="mb-4 ml-2 w-96 border-b-2 border-black text-2xl font-medium">{date}</p>
+						<div class="flex flex-col gap-8">
+							{#each orders as order}
+								{#if formatDate(order.created_at) === date}
+									<div class="flex min-h-32 rounded-md bg-white py-2 hover:bg-gray-100">
+										<div class="flex grow">
+											{#if getCoffeeRoastTypeByOrderId(order.id) === 'light'}
+												<img alt="Light coffee bean" src="light_bean.png" class="w-36 p-2" />
+											{:else if getCoffeeRoastTypeByOrderId(order.id) === 'medium'}
+												<img alt="Medium coffee bean" src="medium_bean.png" class="w-36 p-2" />
+											{:else if getCoffeeRoastTypeByOrderId(order.id) === 'dark'}
+												<img alt="Medium coffee bean" src="dark_bean.png" class="w-36 p-2" />
+											{/if}
 
-										<div>
-											<p class="mt-8 w-[28rem] px-2 text-xl font-medium">
-												{getCoffeeNameByOrderId(order.id)}
-											</p>
-										</div>
-									</div>
-
-									<div class="flex justify-end gap-5">
-										<div class=" flex h-2/3 flex-col justify-center self-center border-r-2">
-											<div class="mr-5">
-												<p class="text-xs text-gray-500">Skrudinimo tipas</p>
-												<p class="font-medium">
-													{getCoffeeRoastTypeByOrderIdAndConvertToLT(order.id)}
+											<div>
+												<p class="mt-8 w-[28rem] px-2 text-xl font-medium">
+													{getCoffeeNameByOrderId(order.id)}
 												</p>
 											</div>
 										</div>
 
-										<div class=" flex h-2/3 flex-col justify-center self-center border-r-2">
-											<div class="mr-5">
-												<p class="text-xs text-gray-500">Kiekis</p>
-												<p class="font-medium">{getQuantityByOrderId(order.id)} g.</p>
+										<div class="flex justify-end gap-5">
+											<div class=" flex h-2/3 flex-col justify-center self-center border-r-2">
+												<div class="mr-5">
+													<p class="text-xs text-gray-500">Skrudinimo tipas</p>
+													<p class="font-medium">
+														{getCoffeeRoastTypeByOrderIdAndConvertToLT(order.id)}
+													</p>
+												</div>
 											</div>
-										</div>
 
-										<div class="flex h-2/3 flex-col justify-center self-center border-r-2">
-											<p class="text-xs text-gray-500">Kaina</p>
-											<p class="mr-5 font-medium">
-												{euroFormatter.format(getPrice(order.id))}
-											</p>
-										</div>
-
-										<div class=" flex h-2/3 flex-col justify-center self-center border-r-2">
-											<div class="mr-5">
-												<p class="text-xs text-gray-500">Užsakymo Nr.</p>
-												<p class="font-medium">{order.id}</p>
+											<div class=" flex h-2/3 flex-col justify-center self-center border-r-2">
+												<div class="mr-5">
+													<p class="text-xs text-gray-500">Kiekis</p>
+													<p class="font-medium">{getQuantityByOrderId(order.id)} g.</p>
+												</div>
 											</div>
-										</div>
 
-										<div class="relative mr-5 flex h-2/3 flex-col justify-center self-center">
-											<p class="text-xs text-gray-500">Statusas</p>
-											<p class="font-medium">{STATUS_LT[order.status]}</p>
+											<div class="flex h-2/3 flex-col justify-center self-center border-r-2">
+												<p class="text-xs text-gray-500">Kaina</p>
+												<p class="mr-5 font-medium">
+													{euroFormatter.format(getPrice(order.id))}
+												</p>
+											</div>
 
-											{#if canCancelOrder(order.status)}
-												<button
-													onclick={() => startCancelingOrder(order.id)}
-													class="absolute left-4 top-24 text-xs underline">Atšaukti</button
-												>
-											{/if}
+											<div class=" flex h-2/3 flex-col justify-center self-center border-r-2">
+												<div class="mr-5">
+													<p class="text-xs text-gray-500">Užsakymo Nr.</p>
+													<p class="font-medium">{order.id}</p>
+												</div>
+											</div>
+
+											<div class="relative mr-5 flex h-2/3 flex-col justify-center self-center">
+												<p class="text-xs text-gray-500">Statusas</p>
+												<p class="font-medium">{STATUS_LT[order.status]}</p>
+
+												{#if canCancelOrder(order.status)}
+													<button
+														onclick={() => startCancelingOrder(order.id)}
+														class="absolute left-4 top-24 text-xs underline">Atšaukti</button
+													>
+												{/if}
+											</div>
 										</div>
 									</div>
-								</div>
-							{/if}
-						{/each}
+								{/if}
+							{/each}
+						</div>
 					</div>
+				{/each}
+			{:else}
+				<div class="flex justify-center">
+					<p class="font-medium">Jūs dar nepateikėte nei vieno užsakymo.</p>
 				</div>
-			{/each}
+			{/if}
 		</div>
 	</article>
 

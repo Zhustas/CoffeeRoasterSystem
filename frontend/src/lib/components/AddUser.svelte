@@ -2,7 +2,7 @@
 	import { hashWithSHA256 } from '$lib/functions';
 	import { userAddedStatus, wantsToAddUser } from '../stores';
 	import AlertMessage from './AlertMessage.svelte';
-	import * as AlertMessageConstants from '../../constants/AlertMessageConstants';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
 	import { onMount } from 'svelte';
 
 	// Lauko kintamieji. Kaip C++ struct

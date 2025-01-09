@@ -7,6 +7,14 @@
 	import Header from '$lib/components/Header.svelte';
 	import { USER_ROASTER } from '$lib/constants/UserTypeConstants';
 	import { onMount } from 'svelte';
+	import AlertMessage from '$lib/components/AlertMessage.svelte';
+	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
+	import { alertStore, type AlertMessageHandler, showAlertMessage } from '$lib/alertmessagehandler';
+
+	let alertMessageHandler: AlertMessageHandler = $state();
+	alertStore.subscribe((state) => {
+		alertMessageHandler = state;
+	});
 
 	let { data }: { data: PageData } = $props();
 	let coffees: Coffee[] = data.coffees;
@@ -51,7 +59,17 @@
 			body: JSON.stringify({ ID })
 		});
 
-		console.log(await response.json());
+		if (response.ok) {
+			showAlertMessage(
+				AlertMessageConstants.STATUS_SUCCESS,
+				`Kava (ID - ${ID}) sėkmingai ištrinta.`
+			);
+		} else {
+			showAlertMessage(
+				AlertMessageConstants.STATUS_FAILURE,
+				`Kavos (ID - ${ID}) nepavyko ištrinti.`
+			);
+		}
 		endDeleteProcess();
 	}
 
@@ -148,7 +166,7 @@
 							<p class="h-full content-center break-words border-r border-black px-2 py-1">
 								{coffee.name}
 							</p>
-							<p class="h-full content-center break-words border-r border-black px-2 py-1">
+							<p class="h-full grow content-center break-words border-r border-black px-2 py-1">
 								{coffee.roast_type}
 							</p>
 							<p class="h-full content-center break-words border-r border-black px-2 py-1">
@@ -180,7 +198,7 @@
 					{/each}
 				{:else}
 					<div
-						class="grid h-10 grid-cols-1 items-center rounded-b-md border-b border-l border-r border-gray-300 bg-white text-center"
+						class="grid h-10 grid-cols-1 items-center rounded-md border border-gray-300 bg-white text-center"
 					>
 						<p>Kavos nėra</p>
 					</div>{/if}
@@ -190,3 +208,7 @@
 
 	<Footer />
 </div>
+
+{#if alertMessageHandler.show}
+	<AlertMessage status={alertMessageHandler.status} message={alertMessageHandler.message} />
+{/if}

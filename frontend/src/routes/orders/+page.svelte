@@ -7,10 +7,16 @@
 	import { USER_ADMIN, USER_ROASTER } from '$lib/constants/UserTypeConstants';
 	import AlertMessage from '$lib/components/AlertMessage.svelte';
 	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
+	import { alertStore, type AlertMessageHandler, showAlertMessage } from '$lib/alertmessagehandler';
 
 	let { data }: { data: PageData } = $props();
 	let orders: Order[] = $state(data.orders.orders);
 	let user = data.user;
+
+	let alertMessageHandler: AlertMessageHandler = $state();
+	alertStore.subscribe((state) => {
+		alertMessageHandler = state;
+	});
 
 	let euroFormatter: Intl.NumberFormat = $state();
 
@@ -131,12 +137,12 @@
 		if (response.ok) {
 			showAlertMessage(
 				AlertMessageConstants.STATUS_SUCCESS,
-				`Užsakymo Nr. ${orderIdChangeStatus} statusas pakeistas į "${STATUS_LT[orderStatusChangeStatus]}".`
+				`Užsakymo Nr. ${orderIdChangeStatus} statusas pakeistas į "${STATUS_LT[orderStatusChangeStatus]}"`
 			);
 		} else {
 			showAlertMessage(
-				AlertMessageConstants.STATUS_SUCCESS,
-				`Įvyko klaidą keičiant užsakymo Nr. ${orderIdChangeStatus} statusą.`
+				AlertMessageConstants.STATUS_FAILURE,
+				`Įvyko klaidą keičiant užsakymo Nr. ${orderIdChangeStatus} statusą`
 			);
 		}
 
@@ -160,33 +166,19 @@
 		});
 
 		if (response.ok) {
-			showAlertMessage(AlertMessageConstants.STATUS_SUCCESS, 'Užsakymas ištrintas.');
+			showAlertMessage(
+				AlertMessageConstants.STATUS_SUCCESS,
+				`Užsakymas Nr. ${orderIdChangeStatus} ištrintas.`
+			);
 		} else {
-			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Įvyko klaida ištrinant užsakymą.');
+			showAlertMessage(
+				AlertMessageConstants.STATUS_FAILURE,
+				`Įvyko klaida ištrinant užsakymą Nr. ${orderIdChangeStatus}`
+			);
 		}
 
 		endDeleteProcess();
 		getOrders();
-	}
-
-	interface AlertMessageHandler {
-		show: boolean;
-		status: string;
-		message: string;
-	}
-
-	const alertMessageHandler: AlertMessageHandler = $state({ show: false, status: '', message: '' });
-	function showAlertMessage(status: string, message: string) {
-		if (alertMessageHandler.show) {
-			return;
-		}
-
-		alertMessageHandler.show = true;
-		alertMessageHandler.status = status;
-		alertMessageHandler.message = message;
-		setTimeout(() => {
-			alertMessageHandler.show = false;
-		}, 5000);
 	}
 </script>
 
@@ -206,7 +198,7 @@
 		class="fixed left-1/2 top-1/2 z-10 h-fit w-[32rem] -translate-x-1/2 -translate-y-1/2 transform rounded-lg bg-white px-4 pb-3 pt-2"
 	>
 		<div>
-			<p class="mb-2 mt-1 text-2xl font-medium">Užsakymo ištrynimas/statuso pakeitimas</p>
+			<p class="mb-2 mt-1 text-2xl font-medium">Užsakymo valdymas</p>
 			<p class="mb-2">Keičiate užsakymo Nr. {orderIdChangeStatus} statusą:</p>
 			<select
 				bind:value={orderStatusChangeStatus}
@@ -222,7 +214,7 @@
 				<button
 					onclick={sendDeleteRequest}
 					class="rounded bg-red-500 px-6 py-1 font-medium text-white hover:bg-red-600"
-					>Ištrinti</button
+					>Ištrinti užsakymą</button
 				>
 				<div class="flex grow justify-end gap-2">
 					<button

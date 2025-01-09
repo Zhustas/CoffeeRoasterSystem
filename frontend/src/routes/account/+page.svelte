@@ -59,7 +59,7 @@
 		<div class="flex grow gap-5">
 			<div class="w-72 rounded-md bg-white">
 				<p class="mb-1 mt-2 text-center text-xl font-medium">{name} {surname}</p>
-				<p class="text-center text-sm text-gray-500">ID: {user.Id}</p>
+				<p class="mb-1 text-center text-sm text-gray-500">ID: {user.Id}</p>
 				<p class="text-center text-sm text-gray-500">{getRoleLT(user.role)}</p>
 			</div>
 

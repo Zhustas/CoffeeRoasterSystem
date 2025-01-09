@@ -9,9 +9,9 @@ async function getCoffees(sessionToken: string) {
 		}
 	});
 
-	const { coffeeList, title }: { coffeeList: Coffee[]; title: string } = await response.json();
+	const { coffeeList }: { coffeeList: Coffee[] } = await response.json();
 
-	return coffeeList;
+	return coffeeList ?? [];
 }
 
 async function getCoffee(sessionToken: string, id: number) {
@@ -24,7 +24,7 @@ async function getCoffee(sessionToken: string, id: number) {
 
 	const { coffeeObject }: { coffeeObject: Coffee } = await response.json();
 
-	return coffeeObject;
+	return coffeeObject ?? [];
 }
 
 async function getOrders(sessionToken: string) {
@@ -92,7 +92,7 @@ async function getUserOrders(sessionToken: string, id: number) {
 
 	const { orders } = await response.json();
 
-	return orders;
+	return orders ?? [];
 }
 
 async function getOrderItems(sessionToken: string, id: number) {
@@ -105,7 +105,7 @@ async function getOrderItems(sessionToken: string, id: number) {
 
 	const body = await response.json();
 
-	return body;
+	return body ?? [];
 }
 
 export {

@@ -63,7 +63,7 @@ func main() {
 			adminOrRoaster.POST("/registernewuser", endpoints.AdminRegister(db))
 			adminOrRoaster.POST("/coffeeinventoryrefresh", endpoints.DisplayCoffeeList(db))
 			adminOrRoaster.POST("/addcoffee", endpoints.ManageNewCoffee(db))
-			adminOrRoaster.POST("/deletecoffee/:id", endpoints.ManageNewCoffee(db))
+			adminOrRoaster.POST("/deletecoffee/:id", endpoints.DeleteOldCoffee(db))
 			adminOrRoaster.GET("/orderlist", endpoints.ViewOrders(db))
 			adminOrRoaster.GET("/allorderlist", endpoints.ViewAllOrders(db))
 			adminOrRoaster.POST("/updateorders/:id", endpoints.UpdateOrders(db))

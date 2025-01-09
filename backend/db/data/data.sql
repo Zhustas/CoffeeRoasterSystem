@@ -1,3 +1,10 @@
+INSERT INTO USERS (name, surname, email, username, password, role)
+VALUES ('Justas', 'Justs', 'justass11@gmail.com', 'Justas', '$2a$14$Qg59UpcwBJ5RG2UqAQ6pTuYja/M1qD4ZPGVu6rPr53vTdtFmHSjma', 'customer');
+INSERT INTO USERS (name, surname, email, username, password, role)
+VALUES ('Elena', 'Eleni', 'elenux98@gmail.com', 'Elena', '$2a$14$Qg59UpcwBJ5RG2UqAQ6pTuYja/M1qD4ZPGVu6rPr53vTdtFmHSjma', 'roaster');
+INSERT INTO USERS (name, surname, email, username, password, role)
+VALUES ('Adminas', 'Adminaitis', 'adminas127@gmail.com', 'Admin', '$2a$14$Qg59UpcwBJ5RG2UqAQ6pTuYja/M1qD4ZPGVu6rPr53vTdtFmHSjma', 'admin');
+
 INSERT INTO COFFEE (name, description, roast_type, stock, price)
 VALUES ('Kavos pupelės Coffee Cruise SWEET BRAZIL', 'Sweet Brazil skonis švelnus ir itin malonus. Geriant šią kavą jaučiamas juodo šokolado kartumas patiks tiems kavos mėgėjams, kurie save palepina keliais puodeliais dienos eigoje. Ilgas kavos pupelių paruošimo laikotarpis suteikia jai brandumo, solidumo, tų gerųjų skoninių savybių, kurias itin vertina tikri kavos gurmanai.', 'light', 2500, 2.7);
 INSERT INTO COFFEE (name, description, roast_type, stock, price)

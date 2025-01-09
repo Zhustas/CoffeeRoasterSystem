@@ -2,8 +2,8 @@
 	import { onDestroy, onMount } from 'svelte';
 	import type { Coffee } from '$lib/coffee';
 	import type { PageData } from './$types';
-	import Footer from '../../components/Footer.svelte';
-	import CoffeeTab from '../../components/CoffeeTab.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import CoffeeTab from '$lib/components/CoffeeTab.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import { USER_CUSTOMER } from '$lib/constants/UserTypeConstants';
 
@@ -372,10 +372,11 @@
 				</div> -->
 			{:else}
 				<div class="flex grow justify-center">
-					<p class="self-center text-sm font-medium">Rezultatų nerasta.</p>
+					<p class="self-center text-sm font-medium">Kavos nerasta.</p>
 				</div>
 			{/if}
 		</div>
 	</article>
+
 	<Footer />
 </div>
