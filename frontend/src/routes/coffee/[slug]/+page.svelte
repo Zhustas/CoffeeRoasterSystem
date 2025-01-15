@@ -165,7 +165,7 @@
 					<div class="flex flex-col justify-end">
 						<button
 							onclick={startOrdering}
-							class="bg-button hover:bg-hover-button h-20 w-full rounded-md text-2xl font-medium tracking-wider"
+							class="h-20 w-full rounded-md bg-button text-2xl font-medium tracking-wider hover:bg-hover-button"
 							>PIRKTI</button
 						>
 					</div>

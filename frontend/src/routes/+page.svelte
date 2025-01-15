@@ -337,7 +337,7 @@
 				<div class="relative w-fit">
 					<p>Skrudykla</p>
 					<div class="group absolute right-0 mt-6 h-2 w-1/2 bg-black">
-						<span aria-hidden="true" class="bg-page animate-slide absolute inset-0"></span>
+						<span aria-hidden="true" class="absolute inset-0 animate-slide bg-page"></span>
 					</div>
 				</div>
 			</div>
@@ -355,10 +355,10 @@
 			<div id="form" class="z-10 grow content-center lg:max-w-xl">
 				<div id="form-upper" class="grid h-8 grid-cols-2 text-center text-sm">
 					<div
-						class="bg-main flex cursor-pointer rounded-tl-full rounded-tr-full {currentFormType ===
+						class="flex cursor-pointer rounded-tl-full rounded-tr-full bg-main {currentFormType ===
 						LOGIN_FORM_TYPE
 							? 'border-l border-r border-t font-medium'
-							: 'hover:bg-hover-button border-b'} border-black"
+							: 'border-b hover:bg-hover-button'} border-black"
 					>
 						<button
 							on:click={() => changeFormType(LOGIN_FORM_TYPE)}
@@ -366,10 +366,10 @@
 						>
 					</div>
 					<div
-						class="bg-main flex cursor-pointer rounded-tl-full rounded-tr-full {currentFormType ===
+						class="flex cursor-pointer rounded-tl-full rounded-tr-full bg-main {currentFormType ===
 						REGISTER_FORM_TYPE
 							? 'border-l border-r border-t font-medium'
-							: 'hover:bg-hover-button border-b'} border-black"
+							: 'border-b hover:bg-hover-button'} border-black"
 					>
 						<button
 							on:click={() => changeFormType(REGISTER_FORM_TYPE)}
@@ -380,7 +380,7 @@
 
 				<div
 					id="form-main"
-					class="bg-main h-fit border-b border-l border-r border-black p-7 pt-5 shadow-sm shadow-black"
+					class="h-fit border-b border-l border-r border-black bg-main p-7 pt-5 shadow-sm shadow-black"
 				>
 					{#if currentFormType === LOGIN_FORM_TYPE}
 						<p class="mt-1 px-2 text-xs text-gray-500">
@@ -563,7 +563,7 @@
 
 				<div
 					id="form-lower"
-					class="bg-button group relative flex h-10 cursor-pointer gap-2 overflow-hidden rounded-b-lg border-b border-l border-r border-black shadow-sm shadow-black"
+					class="group relative flex h-10 cursor-pointer gap-2 overflow-hidden rounded-b-lg border-b border-l border-r border-black bg-button shadow-sm shadow-black"
 				>
 					<button
 						on:click={() => sendRequest()}
@@ -573,7 +573,7 @@
 					>
 					<span
 						aria-hidden="true"
-						class="bg-hover-button -500 absolute inset-0 -translate-x-full transition group-hover:translate-x-0"
+						class="-500 absolute inset-0 -translate-x-full bg-hover-button transition group-hover:translate-x-0"
 					></span>
 				</div>
 			</div>

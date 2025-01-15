@@ -11,7 +11,7 @@
 <div class="flex min-h-screen flex-col">
 	<Header userType={USER_CUSTOMER} />
 
-	<article class="mx-page mt-top mb-bottom grow">
+	<article class="mx-page mb-bottom mt-top grow">
 		<h2 class="text-2xl font-medium">Sveiki atvykę į prenumeratą!</h2>
 	</article>
 

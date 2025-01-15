@@ -147,7 +147,7 @@
 		<Header userType={USER_CUSTOMER} />
 	</div>
 
-	<article class="mx-page mt-top mb-bottom flex grow flex-col">
+	<article class="mx-page mb-bottom mt-top flex grow flex-col">
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			onmouseenter={() => changeHoveringState(true)}

@@ -21,7 +21,7 @@
 		<Header userType={USER_ADMIN} />
 	{/if}
 
-	<article class="mt-top mb-bottom mx-page grow">
+	<article class="mx-page mb-bottom mt-top grow">
 		<h2 class="text-2xl font-medium">Sveiki atvykę į DUK puslapį!</h2>
 	</article>
 

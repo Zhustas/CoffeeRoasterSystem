@@ -93,7 +93,7 @@
 <div class="flex min-h-screen flex-col">
 	<Header userType={USER_ROASTER} />
 
-	<article class="mx-page mt-top mb-bottom flex grow flex-col">
+	<article class="mx-page mb-bottom mt-top flex grow flex-col">
 		<div class="mb-8 border-b-2 border-black">
 			<p class="mb-2 ml-10 text-4xl font-medium">Kavos inventorius</p>
 		</div>

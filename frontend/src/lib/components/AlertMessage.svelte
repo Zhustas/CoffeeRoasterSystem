@@ -11,7 +11,7 @@
 </script>
 
 <div
-	class="animate-slide-message fixed {COLORS[
+	class="fixed animate-slide-message {COLORS[
 		status
 	]} right-5 top-20 z-10 w-fit max-w-80 px-8 py-4 shadow-md shadow-black"
 >

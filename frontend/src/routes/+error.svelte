@@ -7,7 +7,7 @@
 <div class="flex min-h-screen flex-col">
 	<Header userType={USER_NONE} />
 
-	<article class="mx-page mt-top mb-bottom grow">
+	<article class="mx-page mb-bottom mt-top grow">
 		<div class="ml-2">
 			<h2 class="mb-5 text-4xl font-medium text-red-500">Puslapis nerastas. (404)</h2>
 			<p class="text-lg">

@@ -10,6 +10,12 @@ export default [
 	prettier,
 	...svelte.configs['flat/prettier'],
 	{
+		files: ['**/*.svelte'],
+		languageOptions: {
+			parser: 'svelte-eslint-parser'
+		}
+	},
+	{
 		languageOptions: {
 			globals: {
 				...globals.browser,

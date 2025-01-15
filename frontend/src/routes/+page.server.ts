@@ -5,9 +5,11 @@ import { redirect } from '@sveltejs/kit';
 export const load: PageServerLoad = async ({ cookies }) => {
 	const sessionToken = cookies.get('session_token');
 
-	const user = await db.getUserBySessionToken(sessionToken);
+	if (sessionToken) {
+		const user = await db.getUserBySessionToken(sessionToken);
 
-	if (user) {
-		redirect(302, '/main');
+		if (user) {
+			redirect(302, '/main');
+		}
 	}
 };

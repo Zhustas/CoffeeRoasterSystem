@@ -128,7 +128,7 @@
 <div class="flex min-h-screen flex-col">
 	<Header userType={USER_ADMIN} />
 
-	<article class="mx-page mt-top mb-bottom grow">
+	<article class="mx-page mb-bottom mt-top grow">
 		<div class="mb-8 border-b-2 border-black">
 			<p class="mb-2 ml-10 text-4xl font-medium">Vartotojai</p>
 		</div>
