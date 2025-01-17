@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { Coffee } from '$lib/coffee';
+	import type { Coffee } from '$lib/Coffee';
 	import NewCoffee from '$lib/components/NewCoffee.svelte';
 	import { wantsToAddCoffee } from '$lib/stores';
 	import Footer from '$lib/components/Footer.svelte';
@@ -84,6 +84,18 @@
 		'Sukurta',
 		'Atnaujinta'
 	];
+
+	// TODO:
+	// Po atsiskaitymo
+
+	let changed = $state(false);
+	let size: number = $state();
+
+	function changeColumnSize() {
+		changed = true;
+		size = 10;
+	}
+
 </script>
 
 <svelte:head>
@@ -116,12 +128,14 @@
 						<button
 							onclick={endDeleteProcess}
 							class="10 rounded border border-gray-600 bg-white px-6 py-1 font-medium text-gray-600 hover:bg-gray-200"
-							>Ne</button
+						>Ne
+						</button
 						>
 						<button
 							onclick={() => deleteCoffee(selectedID)}
 							class="rounded bg-red-500 px-6 py-1 font-medium text-white hover:bg-red-600"
-							>Taip</button
+						>Taip
+						</button
 						>
 					</div>
 				</div>
@@ -133,24 +147,40 @@
 		{/if}
 
 		<button
-			onclick={startAddProcess}
 			class="mb-5 mr-2 w-48 self-end rounded-md bg-green-500 py-1 font-medium text-white hover:bg-green-600"
+			onclick={startAddProcess}
 		>
-			Sukurti naują kavą</button
+			Sukurti naują kavą
+		</button
 		>
 
 		<div class="flex flex-col">
-			<header
-				class="text-md mb-2 grid h-12 grid-cols-8 items-center rounded-md border border-gray-300 bg-white text-center font-medium"
-			>
-				{#each Array(numberOfColumns) as _, i}
-					{#if i !== numberOfColumns - 1}
-						<p class="h-full content-center border-r border-gray-300">{namesOfColumns[i]}</p>
-					{:else}
-						<p class="h-full content-center border-gray-300">{namesOfColumns[i]}</p>
-					{/if}
-				{/each}
+			<!--			<header-->
+			<!--				class="text-md mb-2 grid h-12 grid-cols-8 items-center rounded-md border border-gray-300 bg-white text-center font-medium"-->
+			<!--			>-->
+			<!--				{#each Array(numberOfColumns) as _, i}-->
+			<!--					{#if i !== numberOfColumns - 1}-->
+			<!--						<p class="h-full content-center border-r border-gray-300">{namesOfColumns[i]}</p>-->
+			<!--					{:else}-->
+			<!--						<p class="h-full content-center border-gray-300">{namesOfColumns[i]}</p>-->
+			<!--					{/if}-->
+			<!--				{/each}-->
+			<!--			</header>-->
+
+			<header class="h-12 bg-white rounded-md border border-gray-300 flex text-center font-medium">
+				<div class="{changed ? `w-[${size}px]` : 'grow'} flex h-full justify-end">
+					<p class="self-start">Hello</p>
+					<button draggable="true" ondrag="{changeColumnSize}" aria-label="Change column size"
+							class="border-2 border-r border-gray-300"></button>
+				</div>
+				<div class="grow border-r border-gray-300 h-full content-center">
+					<p>Test</p>
+				</div>
+				<div class="grow content-center">
+					<p>WOW</p>
+				</div>
 			</header>
+
 			<div>
 				{#if coffees.length !== 0}
 					{#each coffees as coffee, i}
@@ -201,7 +231,8 @@
 						class="grid h-10 grid-cols-1 items-center rounded-md border border-gray-300 bg-white text-center"
 					>
 						<p>Kavos nėra</p>
-					</div>{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</article>

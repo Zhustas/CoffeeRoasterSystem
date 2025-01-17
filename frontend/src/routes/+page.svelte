@@ -2,182 +2,107 @@
 	import AlertMessage from '../lib/components/AlertMessage.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import * as AlertMessageConstants from '$lib/constants/AlertMessageConstants';
+	import { alertStore, type AlertMessageHandler, showAlertMessage } from '$lib/alertmessagehandler';
+	import * as FormTypeConstants from '$lib/constants/FormTypeConstants';
+	import * as InputConstants from '$lib/constants/InputConstants';
+	import type { InputData } from '$lib/inputhandler';
+	import * as InputHandler from '$lib/inputhandler';
 	import { hashWithSHA256 } from '$lib/functions';
+	import { onMount } from 'svelte';
 
-	const LOGIN_FORM_TYPE: number = 0,
-		REGISTER_FORM_TYPE: number = 1;
-	let currentFormType: number = LOGIN_FORM_TYPE;
-	const LOGIN_BUTTON_NAME: string = 'Prisijungti',
-		REGISTER_BUTTON_NAME: string = 'Registruotis';
-	let buttonName: string = LOGIN_BUTTON_NAME;
+	onMount(() => {
+		// const search = new URLSearchParams(window.location.search);
+		// if (search.has('type') && search.get('type') === 'register') {
+		// 	currentFormType = FormTypeConstants.FORM_TYPE_REGISTER;
+		// }
+	});
 
-	// Pakeičia formos tipą (prisijungimas ar registracija)
-	function changeFormType(type: number) {
+	let alertMessageHandler: AlertMessageHandler = $state();
+	alertStore.subscribe((state) => {
+		alertMessageHandler = state;
+	});
+
+	let currentFormType = $state(FormTypeConstants.FORM_TYPE_LOGIN);
+
+	const LOGIN_BUTTON_NAME: string = 'Prisijungti';
+	const REGISTER_BUTTON_NAME: string = 'Registruotis';
+	let buttonName: string = $derived(currentFormType === FormTypeConstants.FORM_TYPE_LOGIN ? LOGIN_BUTTON_NAME : REGISTER_BUTTON_NAME);
+
+	let usernameLogin: InputData = $state(InputHandler.getDefaultInputData()),
+		passwordLogin: InputData = $state(InputHandler.getDefaultInputData());
+
+	let name: InputData = $state(InputHandler.getDefaultInputData()),
+		lastname: InputData = $state(InputHandler.getDefaultInputData()),
+		email: InputData = $state(InputHandler.getDefaultInputData()),
+		usernameRegister: InputData = $state(InputHandler.getDefaultInputData()),
+		passwordRegister: InputData = $state(InputHandler.getDefaultInputData()),
+		passwordRepeat: InputData = $state(InputHandler.getDefaultInputData());
+
+	function changeFormType(type: any) {
 		currentFormType = type;
-		buttonName = currentFormType === LOGIN_FORM_TYPE ? LOGIN_BUTTON_NAME : REGISTER_BUTTON_NAME;
 	}
 
-	// Lauko kintamieji. Kaip C++ struct
-	interface InputData {
-		value: string;
-		error: boolean;
-		errorMessage: string;
-	}
-
-	// Nustato default reikšmes laukams
-	const getDefaultInputData = (): InputData => ({ value: '', error: false, errorMessage: '' });
-
-	// Login laukai
-	let usernameLogin: InputData = getDefaultInputData(),
-		passwordLogin: InputData = getDefaultInputData();
-
-	// Register laukai
-	let name: InputData = getDefaultInputData(),
-		lastname: InputData = getDefaultInputData(),
-		email: InputData = getDefaultInputData(),
-		usernameRegister: InputData = getDefaultInputData(),
-		passwordRegister: InputData = getDefaultInputData(),
-		passwordRepeat: InputData = getDefaultInputData();
-
-	function setDefaultInputData(forWhich: number) {
-		if (forWhich === LOGIN_FORM_TYPE) {
-			usernameLogin = getDefaultInputData();
-			passwordLogin = getDefaultInputData();
-		} else if (forWhich === REGISTER_FORM_TYPE) {
-			name = getDefaultInputData();
-			lastname = getDefaultInputData();
-			email = getDefaultInputData();
-			usernameRegister = getDefaultInputData();
-			passwordRegister = getDefaultInputData();
-			passwordRepeat = getDefaultInputData();
-		}
-	}
-
-	// KONSTANTOS
-
-	const CONST_VALID_PASSWORD_LENGTH = 8;
-	const CONST_VALID_MIN_USERNAME_LENGTH = 5;
-	const CONST_VALID_MAX_USERNAME_LENGTH = 30;
-	const CONST_VALID_MAX_NAME_LASTNAME_LENGTH = 50;
-
-	const ERROR_MESSAGE_EMPTY_INPUT = 'Užpildykite lauką.';
-	const ERROR_MESSAGE_PASSWORDS_NOT_MATCH = 'Slaptažodžiai nesutampa.';
-	const ERROR_MESSAGE_PASSWORD_TOO_SHORT = `Slaptažodis turi būti sudarytas bent iš ${CONST_VALID_PASSWORD_LENGTH} simbolių.`;
-	const ERROR_MESSAGE_USERNAME_BAD_LENGTH = `Vartotojo vardas turi būti nuo ${CONST_VALID_MIN_USERNAME_LENGTH} iki ${CONST_VALID_MAX_USERNAME_LENGTH} simbolių.`;
-	const ERROR_MESSAGE_EMAIL_INVALID = 'Blogas elektroninio pašto formatas.';
-	const ERROR_MESSAGE_NAME_LASTNAME_BAD_LENGTH = `Lauko ilgis turi būti iki ${CONST_VALID_MAX_NAME_LASTNAME_LENGTH} simbolių.`;
-	const ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS = 'Laukas turi būti sudarytas tik iš raidžių.';
-	const ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS_NUMBERS =
-		'Laukas turi būti sudarytas tik iš raidžių ir skaičių.';
-	const ERROR_MESSAGE_USERNAME_EMAIL_EXISTS =
-		'Vartotojo vardas arba elektroninis paštas jau egzistuoja.';
-
-	const ERROR_SERVER_USERNAME_EMAIL_EXISTS =
-		'This username or email is already taken. Please choose another.';
-
-	// Funkcija, skirta atnaujinti lauką (kad suveiktų Svelte reactivity (puslapis rerender'intų))
-	function refreshInputData(input: InputData) {
-		if (input === usernameLogin) {
-			usernameLogin = { ...input };
-		} else if (input === passwordLogin) {
-			passwordLogin = { ...input };
-		} else if (input === name) {
-			name = { ...input };
-		} else if (input === lastname) {
-			lastname = { ...input };
-		} else if (input === email) {
-			email = { ...input };
-		} else if (input === usernameRegister) {
-			usernameRegister = { ...input };
-		} else if (input === passwordRegister) {
-			passwordRegister = { ...input };
-		} else if (input === passwordRepeat) {
-			passwordRepeat = { ...input };
-		}
-	}
-
-	// Atnaujina lauko reikšmes
-	function updateInputData(input: InputData, changes: Partial<InputData>) {
-		Object.assign(input, changes);
-	}
-
-	// Prideda error'ą po lauku
-	function setInputDataError(input: InputData, message: string) {
-		updateInputData(input, { error: true, errorMessage: message });
-		refreshInputData(input);
-	}
-
-	// Ištrina error'ą iš po lauko
-	function removeInputDataError(input: InputData) {
-		updateInputData(input, { error: false, errorMessage: '' });
-		refreshInputData(input);
-	}
-
-	// Gauna prisijungimo laukų list'ą
 	function getLoginInputs(): InputData[] {
 		return [usernameLogin, passwordLogin];
 	}
 
-	// Gauna registracijos laukų list'ą
 	function getRegisterInputs(): InputData[] {
 		return [name, lastname, email, usernameRegister, passwordRegister, passwordRepeat];
 	}
 
-	// Parodo arba panaikina error puslapyje po input laukais
 	function updateInputDataErrors() {
-		const inputs = currentFormType === LOGIN_FORM_TYPE ? getLoginInputs() : getRegisterInputs();
-
+		const inputs = currentFormType === FormTypeConstants.FORM_TYPE_LOGIN ? getLoginInputs() : getRegisterInputs();
 		inputs.forEach((input) => {
 			if (!input.value) {
-				setInputDataError(input, ERROR_MESSAGE_EMPTY_INPUT);
+				InputHandler.setInputDataError(input, InputConstants.ERROR_EMPTY_INPUT);
 			} else {
-				removeInputDataError(input);
+				InputHandler.removeInputDataError(input);
 			}
 		});
 
-		if (currentFormType === REGISTER_FORM_TYPE) {
+		if (currentFormType === FormTypeConstants.FORM_TYPE_REGISTER) {
 			if (!name.error) {
-				if (name.value.length > CONST_VALID_MAX_NAME_LASTNAME_LENGTH) {
-					setInputDataError(name, ERROR_MESSAGE_NAME_LASTNAME_BAD_LENGTH);
+				if (name.value.length > InputConstants.VALID_MAX_NAME_LENGTH) {
+					InputHandler.setInputDataError(name, InputConstants.ERROR_NAME_BAD_LENGTH);
 				} else if (!hasOnlyLetters(name.value)) {
-					setInputDataError(name, ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS);
+					InputHandler.setInputDataError(name, InputConstants.ERROR_CONSISTS_NOT_ONLY_LETTERS);
 				}
 			}
 
 			if (!lastname.error) {
-				if (lastname.value.length > CONST_VALID_MAX_NAME_LASTNAME_LENGTH) {
-					setInputDataError(lastname, ERROR_MESSAGE_NAME_LASTNAME_BAD_LENGTH);
+				if (lastname.value.length > InputConstants.VALID_MAX_LASTNAME_LENGTH) {
+					InputHandler.setInputDataError(lastname, InputConstants.ERROR_LASTNAME_BAD_LENGTH);
 				} else if (!hasOnlyLetters(lastname.value)) {
-					setInputDataError(lastname, ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS);
+					InputHandler.setInputDataError(lastname, InputConstants.ERROR_CONSISTS_NOT_ONLY_LETTERS);
 				}
 			}
 
 			if (!email.error) {
 				if (!isEmailValid(email.value)) {
-					setInputDataError(email, ERROR_MESSAGE_EMAIL_INVALID);
+					InputHandler.setInputDataError(email, InputConstants.ERROR_EMAIL_INVALID);
 				}
 			}
 
 			if (!usernameRegister.error) {
 				if (
-					usernameRegister.value.length < CONST_VALID_MIN_USERNAME_LENGTH ||
-					usernameRegister.value.length > CONST_VALID_MAX_USERNAME_LENGTH
+					usernameRegister.value.length < InputConstants.VALID_MIN_USERNAME_LENGTH ||
+					usernameRegister.value.length > InputConstants.VALID_MAX_USERNAME_LENGTH
 				) {
-					setInputDataError(usernameRegister, ERROR_MESSAGE_USERNAME_BAD_LENGTH);
+					InputHandler.setInputDataError(usernameRegister, InputConstants.ERROR_USERNAME_BAD_LENGTH);
 				} else if (!hasOnlyLettersNumbers(usernameRegister.value)) {
-					setInputDataError(usernameRegister, ERROR_MESSAGE_CONSISTS_NOT_ONLY_LETTERS_NUMBERS);
+					InputHandler.setInputDataError(usernameRegister, InputConstants.ERROR_CONSISTS_NOT_ONLY_LETTERS_NUMBERS);
 				}
 			}
 
 			if (!passwordRegister.error) {
-				if (passwordRegister.value.length < CONST_VALID_PASSWORD_LENGTH) {
-					setInputDataError(passwordRegister, ERROR_MESSAGE_PASSWORD_TOO_SHORT);
+				if (passwordRegister.value.length < InputConstants.VALID_PASSWORD_LENGTH) {
+					InputHandler.setInputDataError(passwordRegister, InputConstants.ERROR_PASSWORD_TOO_SHORT);
 				}
 			}
 
 			if (!passwordRepeat.error) {
 				if (passwordRegister.value !== passwordRepeat.value) {
-					setInputDataError(passwordRepeat, ERROR_MESSAGE_PASSWORDS_NOT_MATCH);
+					InputHandler.setInputDataError(passwordRepeat, InputConstants.ERROR_PASSWORDS_NOT_MATCH);
 				}
 			}
 		}
@@ -208,7 +133,7 @@
 
 	// Ar yra nors viena klaida prisijungime/registracijoje
 	function areAnyInputDataErrors(): boolean {
-		const inputs = currentFormType === LOGIN_FORM_TYPE ? getLoginInputs() : getRegisterInputs();
+		const inputs = currentFormType === FormTypeConstants.FORM_TYPE_LOGIN ? getLoginInputs() : getRegisterInputs();
 
 		return inputs.some((input) => input.error);
 	}
@@ -266,9 +191,8 @@
 
 		if (response.status === 200) {
 			showAlertMessage(AlertMessageConstants.STATUS_SUCCESS, 'Registracija sėkminga!');
-			currentFormType = LOGIN_FORM_TYPE;
-			buttonName = LOGIN_BUTTON_NAME;
-			setDefaultInputData(REGISTER_FORM_TYPE);
+			currentFormType = FormTypeConstants.FORM_TYPE_LOGIN;
+			InputHandler.setDefaultInputData(getRegisterInputs());
 		} else if (response.status === 409) {
 			showAlertMessage(
 				AlertMessageConstants.STATUS_FAILURE,
@@ -279,26 +203,6 @@
 		} else {
 			showAlertMessage(AlertMessageConstants.STATUS_FAILURE, 'Įvyko nežinoma klaida.');
 		}
-	}
-
-	interface AlertMessageHandler {
-		show: boolean;
-		status: string;
-		message: string;
-	}
-
-	const alertMessageHandler: AlertMessageHandler = { show: false, status: '', message: '' };
-	function showAlertMessage(status: string, message: string) {
-		if (alertMessageHandler.show) {
-			return;
-		}
-
-		alertMessageHandler.show = true;
-		alertMessageHandler.status = status;
-		alertMessageHandler.message = message;
-		setTimeout(() => {
-			alertMessageHandler.show = false;
-		}, 5000);
 	}
 
 	// Pagrindinė request siuntimo funkcija
@@ -313,7 +217,7 @@
 			return;
 		}
 
-		if (currentFormType === LOGIN_FORM_TYPE) {
+		if (currentFormType === FormTypeConstants.FORM_TYPE_LOGIN) {
 			sendLoginRequest();
 		} else {
 			sendRegisterRequest();
@@ -356,24 +260,26 @@
 				<div id="form-upper" class="grid h-8 grid-cols-2 text-center text-sm">
 					<div
 						class="flex cursor-pointer rounded-tl-full rounded-tr-full bg-main {currentFormType ===
-						LOGIN_FORM_TYPE
+						FormTypeConstants.FORM_TYPE_LOGIN
 							? 'border-l border-r border-t font-medium'
 							: 'border-b hover:bg-hover-button'} border-black"
 					>
 						<button
-							on:click={() => changeFormType(LOGIN_FORM_TYPE)}
-							class="grow rounded-tl-full rounded-tr-full">Prisijungimas</button
+							onclick={() => changeFormType(FormTypeConstants.FORM_TYPE_LOGIN)}
+							class="grow rounded-tl-full rounded-tr-full">Prisijungimas
+						</button
 						>
 					</div>
 					<div
 						class="flex cursor-pointer rounded-tl-full rounded-tr-full bg-main {currentFormType ===
-						REGISTER_FORM_TYPE
+						FormTypeConstants.FORM_TYPE_REGISTER
 							? 'border-l border-r border-t font-medium'
 							: 'border-b hover:bg-hover-button'} border-black"
 					>
 						<button
-							on:click={() => changeFormType(REGISTER_FORM_TYPE)}
-							class="grow rounded-tl-full rounded-tr-full">Registracija</button
+							onclick={() => changeFormType(FormTypeConstants.FORM_TYPE_REGISTER)}
+							class="grow rounded-tl-full rounded-tr-full">Registracija
+						</button
 						>
 					</div>
 				</div>
@@ -382,27 +288,27 @@
 					id="form-main"
 					class="h-fit border-b border-l border-r border-black bg-main p-7 pt-5 shadow-sm shadow-black"
 				>
-					{#if currentFormType === LOGIN_FORM_TYPE}
+					{#if currentFormType === FormTypeConstants.FORM_TYPE_LOGIN}
 						<p class="mt-1 px-2 text-xs text-gray-500">
-							- Įveskite elektroninį paštą ir slaptažodį norint prisijungti.
+							- Įveskite vartotojo vardą ir slaptažodį norint prisijungti.
 						</p>
 					{:else}
 						<p class="mt-1 px-2 text-xs text-gray-500">
 							- Įveskite informaciją norint užsiregistruoti.
 						</p>
 					{/if}
-					{#if currentFormType === LOGIN_FORM_TYPE}
+					{#if currentFormType === FormTypeConstants.FORM_TYPE_LOGIN}
 						<div id="form-login" class="my-5 flex flex-col gap-4">
 							<div class="flex flex-col">
 								<label
 									for="email-login"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Vartotojo vardas</label
+								>Vartotojo vardas</label
 								>
 								<input
 									id="email-login"
 									bind:value={usernameLogin.value}
-									type="email"
+									type="text"
 									class="{usernameLogin.error
 										? 'border-red-600'
 										: 'border-button'} rounded-md hover:border-gray-400 focus:border-black focus:outline-none focus:ring-0"
@@ -417,7 +323,7 @@
 								<label
 									for="password-login"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Slaptažodis</label
+								>Slaptažodis</label
 								>
 								<input
 									id="password-login"
@@ -435,13 +341,13 @@
 							</div>
 						</div>
 					{/if}
-					{#if currentFormType === REGISTER_FORM_TYPE}
+					{#if currentFormType === FormTypeConstants.FORM_TYPE_REGISTER}
 						<div id="form-register" class="my-5 flex flex-col gap-4">
 							<div class="flex flex-col">
 								<label
 									for="name"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Vardas</label
+								>Vardas</label
 								>
 								<input
 									id="name"
@@ -461,7 +367,7 @@
 								<label
 									for="lastname"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Pavardė</label
+								>Pavardė</label
 								>
 								<input
 									id="lastname"
@@ -481,7 +387,7 @@
 								<label
 									for="email-register"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Elektroninis paštas</label
+								>Elektroninis paštas</label
 								>
 								<input
 									id="email-register"
@@ -501,7 +407,7 @@
 								<label
 									for="username"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Vartotojo vardas</label
+								>Vartotojo vardas</label
 								>
 								<input
 									id="username"
@@ -521,7 +427,7 @@
 								<label
 									for="password-register"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Slaptažodis</label
+								>Slaptažodis</label
 								>
 								<input
 									id="password-register"
@@ -541,7 +447,7 @@
 								<label
 									for="password-repeat"
 									class="relative mb-1 ml-1 w-fit after:absolute after:-right-2.5 after:inline-block after:font-medium after:text-red-600 after:content-['*']"
-									>Pakartokite slaptažodį</label
+								>Pakartokite slaptažodį</label
 								>
 								<input
 									id="password-repeat"
@@ -566,9 +472,9 @@
 					class="group relative flex h-10 cursor-pointer gap-2 overflow-hidden rounded-b-lg border-b border-l border-r border-black bg-button shadow-sm shadow-black"
 				>
 					<button
-						on:click={() => sendRequest()}
+						onclick={() => sendRequest()}
 						class="z-10 grow text-end font-semibold tracking-widest"
-						>{buttonName.toUpperCase()}
+					>{buttonName.toUpperCase()}
 						<span class="mr-2 text-lg">&rarr;</span></button
 					>
 					<span

@@ -1,5 +1,6 @@
 const { subtle } = globalThis.crypto;
 
+// TODO: Negalėjau hashint naudojant SHA-512, kadangi "backend" neleido
 async function hashWithSHA256(value: string) {
 	const textEncoder = new TextEncoder();
 	const encodedValue = textEncoder.encode(value);

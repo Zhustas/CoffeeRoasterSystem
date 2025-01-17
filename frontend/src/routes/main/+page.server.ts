@@ -6,20 +6,22 @@ import { redirect } from '@sveltejs/kit';
 export const load: PageServerLoad = async ({ cookies, url }) => {
 	const sessionToken = cookies.get('session_token');
 
-	const user = await db.getUserBySessionToken(sessionToken);
+	if (sessionToken) {
+		const user = await db.getUserBySessionToken(sessionToken);
 
-	if (user) {
-		if (user.role === USER_CUSTOMER) {
+		if (user) {
+			if (user.role === USER_CUSTOMER) {
+				return {
+					user,
+					coffees: await db.getCoffees(sessionToken)
+				};
+			}
+
 			return {
-				user,
-				coffees: await db.getCoffees(sessionToken)
+				user
 			};
 		}
 
-		return {
-			user
-		};
+		redirect(302, `/?redirectTo=${url.pathname}`);
 	}
-
-	redirect(302, `/?redirectTo=${url.pathname}`);
 };
